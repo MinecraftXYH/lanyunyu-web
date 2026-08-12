@@ -4,9 +4,11 @@
  * 这样部署后数据持久化、还能在 GitHub 历史里查看所有变更
  */
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'MinecraftXYH/lanyunyu-web';
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'master';
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const ADMIN_USER = process.env.LYY_ADMIN_USER || 'admin';
 const ADMIN_PWD = process.env.LYY_ADMIN_PWD || 'lyy20260701';
@@ -78,15 +80,28 @@ async function writeRepoFile(path, contentObj, message, sha) {
   return await r.json();
 }
 
-async function readJSON(path, fallback) {
+async function readJSON(file, fallback) {
   try {
-    const f = await readRepoFile(path);
-    if (!f) return fallback;
-    const raw = Buffer.from(f.content, 'base64').toString('utf8');
-    return JSON.parse(raw);
+    if (GITHUB_TOKEN) {
+      const f = await readRepoFile(file);
+      if (f) {
+        const raw = Buffer.from(f.content, 'base64').toString('utf8');
+        return JSON.parse(raw);
+      }
+    }
   } catch (e) {
-    return fallback;
+    console.error('GitHub read failed for', file, e.message);
   }
+  // 本地兜底：Vercel 打包时 api/ 下的 json 会随函数一起发布
+  try {
+    const local = path.join(__dirname, file);
+    if (fs.existsSync(local)) {
+      return JSON.parse(fs.readFileSync(local, 'utf8'));
+    }
+  } catch (e) {
+    console.error('Local read failed for', file, e.message);
+  }
+  return fallback;
 }
 
 async function writeJSON(path, obj, message) {
