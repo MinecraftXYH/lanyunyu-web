@@ -1,0 +1,8 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/(.*\\.html)", "destination": "/public/$1" },
+    { "source": "/assets/(.*)", "destination": "/public/assets/$1" }
+  ]
+}

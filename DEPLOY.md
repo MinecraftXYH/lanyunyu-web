@@ -1,72 +1,103 @@
-# 蓝云屿官网 · 免费部署指南
+# 蓝云屿官网 · 部署指南（Vercel 方案）
 
-本站是 **Node.js 零依赖** 项目（`server.js` 自带所有逻辑，无需 `npm install`）。
-启动命令：`node server.js` 或 `npm start`（已在 package.json 配置）。
-端口：默认 3000，云平台的 `PORT` 环境变量会自动注入，无需改代码。
+## 为什么选 Vercel
 
-> ⚠️ **平台变更（2026）**：Zeabur 新项目必须绑定付费服务器，已不再免费，请勿使用。
-> 下面推荐 **Render.com（免费 · 免信用卡）**。
+- ✅ **完全免费**（Hobby 计划）
+- ✅ **无需信用卡**（注册即可用）
+- ✅ **不休眠**（不像 Replit / Render 免费层那样睡着）
+- ✅ **支持自定义域名 + 自动 HTTPS**
+- ✅ **数据持久化**：后台的留言会 commit 到 GitHub 仓库，每次都有历史记录
 
----
+## 部署步骤
 
-## 推荐方案：Render.com（免费 · 免信用卡）
+### 1. 准备 GitHub Personal Access Token（PAT）
 
-- 免费 Web Service，**免信用卡**，每月 5GB 流量。
-- 15 分钟无访问会休眠；用免费 **UptimeRobot** 每 5 分钟 ping 一次即可实现「永远在线」。
-- 需要把项目推到 GitHub（本机需装 Git，免费）。
+进入 https://github.com/settings/tokens → **Generate new token (classic)**：
+- Note: 填 `vercel-lanyunyu`
+- Expiration: No expiration
+- Scopes: 勾选 `repo`（完整仓库访问）
 
-### 教程视频已改为外链（已就绪）
+点 **Generate token**，**复制保存**那串 `ghp_...` 开头的字符串（关掉页面就再也找不到了）。
 
-视频不再进仓库、也不占 Render 流量。下载页的播放器读取 `data.json` 里的 `tutorial.url` 字段自动渲染：
-- **B站链接**（含 `BVxxxx`）：自动内嵌播放器，最干净。
-- **通用 mp4 直链**：直接内嵌 `<video>` 播放。
-- **网盘等其它链接**：显示「▶ 去外部观看」跳转按钮。
+### 2. 把代码推上去
 
-**你只需做一步**：把视频传到 B站 / 腾讯微云 / 百度网盘，拿到分享链接后，编辑 `data.json` 把
-```json
-"tutorial": { "url": "", "provider": "bilibili" }
+你之前已经把代码推到 `https://github.com/MinecraftXYH/lanyunyu-web`，我新增了 `api/`、`vercel.json` 等文件，现在需要把改动推上去：
+
+```bash
+cd C:\Users\admin\WorkBuddy\2026-08-12-08-55-57
+git add .
+git commit -m "feat: vercel serverless api"
+git push
 ```
-里的 `url` 填上链接，重新部署即可。链接为空时页面显示「教程视频即将上线」，不影响其它功能。
 
-> 注：本地 `assets/downloads/服务器安装教程-新手必看.mp4` 已被 `.gitignore` 忽略，不会提交，可留作备份。
+### 3. Vercel 部署
 
-### 部署步骤
+1. 打开 https://vercel.com → 点 **Sign Up** → 选 **Continue with GitHub**（免信用卡）
+2. 授权后回到 Vercel，点 **Add New → Project**
+3. 找到 `MinecraftXYH/lanyunyu-web` 仓库，点 **Import**
+4. 配置项目：
+   - **Project Name**: `lanyunyu-web`（或任意）
+   - **Framework Preset**: 选 **Other**
+   - **Build & Output Settings**: 全默认（Vercel 自动识别）
+5. **展开 Environment Variables**，添加：
+   - `GITHUB_TOKEN` = 你刚才生成的 `ghp_...`
+   - `GITHUB_REPO` = `MinecraftXYH/lanyunyu-web`
+   - `LYY_ADMIN_USER` = `admin`（可选，默认就是 admin）
+   - `LYY_ADMIN_PWD` = `lyy20260701`（可选，默认就是这个）
+6. 点 **Deploy**
 
-1. 装 Git（如未安装）：下载 Git for Windows，一路默认安装。
-2. GitHub 新建空仓库（免费、免信用卡）。
-3. 本地已 `git init` 且暂存完成（视频已排除）→ 设置身份 → `git commit` → `git push` 到 GitHub。
-4. 注册 render.com（免信用卡；**若被要求填信用卡请停下告诉我**）→ New → Web Service → 关联该仓库。
-5. Build Command 留空，Start Command 填 `npm start`。
-6. 部署完成得到 `xxx.onrender.com` 网址。
-7. 注册免费 UptimeRobot → Add New Monitor → URL 填你的 onrender 网址 → 间隔选 5 分钟，防休眠。
+等 1-2 分钟，部署完成会给你一个网址 `lanyunyu-web.vercel.app`，打开看效果。
 
-### 后台与域名
+### 4. 绑定你的域名（可选）
 
-- 后台：`你的网址/admin.html`，账号 `admin`，密码 `lyy20260701`（可用环境变量 `LYY_ADMIN_USER` / `LYY_ADMIN_PWD` 覆盖）。
-- 自定义域名：上线后在 Render 控制台 **Domains** 添加，按提示到域名 DNS 处加记录，自动签发 SSL。
-  若你的 Minecraft 服务器也用同一个域名当连接地址，请勿直接把根域名 A 记录指向 Render，否则 MC 会连不上；
-  用子域名（如 `www.mclyy.top`）放网站，或根域名给网站 + 给 MC 加 `_minecraft._tcp` 的 SRV 记录。
+在 Vercel 项目 → **Settings → Domains** → 输入域名 → 按提示去域名服务商加一条 `CNAME` 记录指向 `cname.vercel-dns.com`。
 
----
+⚠️ **重要提醒（避免搞崩 MC）**：如果你的域名 `mclyy.top` 同时也是 Minecraft 服务器连接地址，把根域名绑给 Vercel 会让 MC 连不上。两种安全做法：
+- **用子域名放网站**：比如 `www.mclyy.top` 绑 Vercur，`mclyy.top` 留给 MC 服务器
+- **根域名给网站 + MC 用 SRV**：把根域 A 记录指 Vercel，再单独加 `_minecraft._tcp.mclyy.top` 的 SRV 记录指向 MC 服务器真实 IP
 
-## 备选方案：Replit（免装 Git，文件夹直传）
+需要我帮你写具体 DNS 记录，告诉我你的域名和 MC 服务器真实 IP。
 
-- replit.com 注册（免信用卡）→ New Repl → 选 Node.js → 上传项目文件夹 → 设启动命令 `node server.js` → 得到 `xxx.replit.app` 公网网址。
-- 优点：不用 Git、最省事；教程视频已走外链，不受影响。
-- 缺点：免费版空闲会休眠，**不是真正长久在线**（UptimeRobot 探活对 Replit 免费版效果有限）。
+### 5. 后台管理
 
----
+- 后台地址：`https://你的域名/admin.html`
+- 账号：`admin`
+- 密码：`lyy20260701`
 
-## ⚠️ 流量提醒（重要）
+## 日常修改
 
-教程视频已走外链，服务器零流量负担，最稳。仓库仅含代码与图片/整合包（整合包 5.3MB，下载走 Render 流量，免费层 5GB/月足够日常使用）。
+- 改网站配置：在后台编辑 → 自动 commit 到 GitHub → Vercel 自动重新部署（约 30 秒生效）
+- 改代码：在本地改完 `git push`，Vercel 自动部署
 
----
+## 文件说明
 
-## 本地运行（给自己看 / 调试）
+```
+api/
+├── _lib.js                  # 共享工具（GitHub API 调用、token 校验）
+├── login.js                # POST 登录
+├── config.js               # GET/POST 配置
+├── contact.js              # POST 联系留言
+├── contacts.js             # GET 联系留言列表
+└── contacts/[id].js        # DELETE 单条留言
+public/                     # 静态文件
+├── index.html / about.html / download.html / admin.html
+└── assets/                 # CSS / JS / 图片 / 下载文件
+data.json                   # 网站配置（用 data.json 里的内容渲染）
+vercel.json                 # Vercel 路由配置
+server.js                   # 本地测试用（部署到 Vercel 用不到）
+DEPLOY.md                   # 本文件
+```
+
+## 本地测试
 
 ```bash
 node server.js
-# 浏览器打开 http://localhost:3000
-# 后台：http://localhost:3000/admin.html
+# 访问 http://localhost:3000
 ```
+
+## 故障排查
+
+- **后台登录提示失败**：检查 Vercel → Settings → Environment Variables 里 `LYY_ADMIN_USER` 和 `LYY_ADMIN_PWD` 是否设置正确（默认 admin / lyy20260701）
+- **保存配置失败 / 留言提交失败**：检查 `GITHUB_TOKEN` 是否有效（PAT 没过期、勾了 repo 权限）
+- **看不到最新内容**：Vercel 部署会自动跑，重新部署后浏览器硬刷新 `Ctrl+Shift+R`
+- **GitHub API 速率限制**：默认 5000 次/小时，远超你站点的用量，无需担心

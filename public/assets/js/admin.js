@@ -1,0 +1,267 @@
+// 蓝云屿后台脚本：登录 -> 读取配置 -> 编辑 -> 保存到服务器
+let EDIT = {};
+let TOKEN = localStorage.getItem('lyy_token') || '';
+const AUTH_KEY = 'lyy_token';
+
+// 顶层对象字段定义（label + 路径）
+const TOP_SCHEMA = {
+  server: [
+    { k: 'name', label: '服务器名' },
+    { k: 'slogan', label: '口号' },
+    { k: 'ip', label: '服务器 IP' },
+    { k: 'version', label: '游戏版本' },
+    { k: 'platformNote', label: '平台说明（如：基岩/Java 互通，主要 Java）' },
+    { k: 'motd', label: 'MOTD 简介' },
+    { k: 'owner', label: '腐竹 / 服主名' }
+  ],
+  hero: [
+    { k: 'announce', label: '首页公告条' },
+    { k: 'titlePrefix', label: '标题前缀（如：欢迎来到）' },
+    { k: 'titleAccent', label: '标题高亮词（如：蓝云屿）' },
+    { k: 'desc', label: '首页描述' },
+    { k: 'tagsCsv', label: '标签（逗号分隔）' }
+  ],
+  community: [
+    { k: 'title', label: '板块标题' },
+    { k: 'subtitle', label: '板块副标题' },
+    { k: 'qqName', label: 'QQ 群名称' },
+    { k: 'qqDesc', label: 'QQ 群描述' },
+    { k: 'qqBtn', label: 'QQ 按钮文字' }
+  ],
+  contact: [
+    { k: 'title', label: '板块标题' },
+    { k: 'subtitle', label: '板块副标题' }
+  ]
+};
+
+const REPEAT_SCHEMA = {
+  features: [
+    { k: 'icon', label: '图标（emoji）' },
+    { k: 'title', label: '标题' },
+    { k: 'desc', label: '描述' }
+  ],
+  steps: [
+    { k: 'title', label: '标题' },
+    { k: 'desc', label: '描述' }
+  ],
+  screenshots: [
+    { k: 'src', label: '图片地址（src）' },
+    { k: 'caption', label: '说明文字' }
+  ],
+  downloads: [
+    { k: 'name', label: '名称' },
+    { k: 'version', label: '版本' },
+    { k: 'desc', label: '描述' },
+    { k: 'url', label: '下载链接' },
+    { k: 'size', label: '大小' }
+  ],
+  announcements: [
+    { k: 'date', label: '日期' },
+    { k: 'title', label: '标题' },
+    { k: 'content', label: '内容' }
+  ],
+  players: [
+    { k: 'name', label: '昵称' },
+    { k: 'role', label: '身份' },
+    { k: 'note', label: '备注' }
+  ]
+};
+
+function authHeaders(extra = {}) {
+  return Object.assign({ 'Content-Type': 'application/json' }, extra, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {});
+}
+function getByPath(o, p) { return p.reduce((a, k) => (a == null ? a : a[k]), o); }
+function setByPath(o, p, v) {
+  let c = o;
+  for (let i = 0; i < p.length - 1; i++) {
+    if (c[p[i]] == null || typeof c[p[i]] !== 'object') c[p[i]] = {};
+    c = c[p[i]];
+  }
+  const last = p[p.length - 1];
+  if (typeof v === 'string') {
+    if (last === 'online') c[last] = (v === 'true' || v === '1' || v === '开');
+    else if (['players', 'maxPlayers', 'online'].includes(last) && v !== '' && !isNaN(v)) c[last] = Number(v);
+    else c[last] = v;
+  } else c[last] = v;
+}
+
+function field(path, label, value, isTextarea) {
+  const v = value == null ? '' : String(value);
+  const common = `data-bind="${path.join('|')}" placeholder="${label}"`;
+  return `<div class="admin-field"><label>${label}</label>${isTextarea
+    ? `<textarea ${common}>${escAttr(v)}</textarea>`
+    : `<input type="text" ${common} value="${escAttr(v)}" />`}</div>`;
+}
+function escAttr(s) { return String(s).replace(/"/g, '&quot;'); }
+
+// 把 CSV 转数组 / 数组转 CSV，用于 contact.subjects、contact.guide、hero.tags
+function prepareCsv(obj) {
+  if (obj.hero && obj.hero.tagsCsv == null) obj.hero.tagsCsv = (obj.hero.tags || []).join(',');
+  if (obj.contact && obj.contact.subjectsCsv == null) obj.contact.subjectsCsv = (obj.contact.subjects || []).join(',');
+  if (obj.contact && obj.contact.guideCsv == null) obj.contact.guideCsv = (obj.contact.guide || []).join('\n');
+}
+function restoreCsv(obj) {
+  if (obj.hero && obj.hero.tagsCsv != null) obj.hero.tags = obj.hero.tagsCsv.split(',').map(s => s.trim()).filter(Boolean);
+  if (obj.contact) {
+    if (obj.contact.subjectsCsv != null) obj.contact.subjects = obj.contact.subjectsCsv.split(',').map(s => s.trim()).filter(Boolean);
+    if (obj.contact.guideCsv != null) obj.contact.guide = obj.contact.guideCsv.split('\n').map(s => s.trim()).filter(Boolean);
+  }
+}
+
+function renderTop(key, containerId) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  c.innerHTML = TOP_SCHEMA[key].map(f => field([key, f.k], f.label, getByPath(EDIT, [key, f.k]), key === 'hero' && f.k === 'desc')).join('');
+}
+
+function renderRepeat(key, containerId) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  const arr = EDIT[key] || (EDIT[key] = []);
+  c.innerHTML = arr.map((it, i) => `
+    <div class="repeat-card" data-idx="${i}">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <strong>#${i + 1}</strong>
+        <button class="admin-btn danger" data-del="${key}" data-i="${i}">删除</button>
+      </div>
+      <div class="admin-row">
+        ${REPEAT_SCHEMA[key].map(f => field([key, i, f.k], f.label, it[f.k], f.k === 'desc' || f.k === 'content' || f.k === 'note')).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderAllForms() {
+  prepareCsv(EDIT);
+  renderTop('server', 'serverFields');
+  renderTop('hero', 'heroFields');
+  renderTop('community', 'communityFields');
+  renderTop('contact', 'contactFields');
+  for (const k in REPEAT_SCHEMA) renderRepeat(k, k + 'List');
+  populateBinds();
+}
+
+// 填充所有带 data-bind 的输入框（包括硬编码的多层字段，如 server|status|online）
+function populateBinds() {
+  document.querySelectorAll('[data-bind]').forEach(el => {
+    const p = el.dataset.bind.split('|');
+    let v = getByPath(EDIT, p);
+    if (v == null) v = '';
+    else if (typeof v === 'boolean') v = v ? 'true' : 'false';
+    else v = String(v);
+    if (el.tagName === 'TEXTAREA') el.value = v;
+    else el.value = v;
+  });
+}
+
+// ---------- 事件 ----------
+function bindGlobal() {
+  document.getElementById('loginBtn').addEventListener('click', doLogin);
+  document.getElementById('pwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.removeItem(AUTH_KEY); location.reload(); });
+  document.getElementById('saveBtn').addEventListener('click', doSave);
+  document.getElementById('resetBtn').addEventListener('click', () => { loadConfig(true); toast('已重置为服务器当前值'); });
+  document.getElementById('refreshMsg').addEventListener('click', loadContacts);
+
+  document.addEventListener('input', e => {
+    const inp = e.target;
+    if (inp.dataset.bind) {
+      const p = inp.dataset.bind.split('|');
+      setByPath(EDIT, p, inp.value);
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (e.target.dataset.del) {
+      const k = e.target.dataset.del, i = Number(e.target.dataset.i);
+      EDIT[k].splice(i, 1); renderRepeat(k, k + 'List');
+    }
+    if (e.target.dataset.add) {
+      const k = e.target.dataset.add;
+      const blank = {};
+      REPEAT_SCHEMA[k].forEach(f => blank[f.k] = '');
+      EDIT[k].push(blank); renderRepeat(k, k + 'List');
+    }
+  });
+
+  // 侧边栏高亮
+  document.querySelectorAll('.admin-sidebar a').forEach(a => {
+    a.addEventListener('click', () => {
+      document.querySelectorAll('.admin-sidebar a').forEach(x => x.classList.remove('active'));
+      a.classList.add('active');
+    });
+  });
+}
+
+async function doLogin() {
+  const user = document.getElementById('userInput').value;
+  const pwd = document.getElementById('pwdInput').value;
+  const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user, pwd }) });
+  const j = await res.json();
+  if (j.ok) {
+    TOKEN = j.token; localStorage.setItem(AUTH_KEY, TOKEN);
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('adminFrame').style.display = 'flex';
+    loadConfig();
+    loadContacts();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+
+async function loadConfig(silent) {
+  try {
+    const res = await fetch('/api/config', { headers: authHeaders() });
+    EDIT = await res.json();
+    renderAllForms();
+  } catch (e) { toast('读取配置失败'); }
+}
+
+async function doSave() {
+  restoreCsv(EDIT);
+  const np = document.getElementById('newPwd').value;
+  if (np) {
+    // 密码修改通过环境变量/重启生效，这里提示
+    toast('提示：修改密码需重启服务并设置环境变量 LYY_ADMIN_PWD');
+  }
+  try {
+    const res = await fetch('/api/config', { method: 'POST', headers: authHeaders(), body: JSON.stringify(EDIT) });
+    const j = await res.json();
+    if (j.ok) toast('✅ 已保存到服务器'); else toast(j.msg || '保存失败');
+  } catch (e) { toast('保存失败：网络错误'); }
+}
+
+async function loadContacts() {
+  const c = document.getElementById('contactsList');
+  try {
+    const res = await fetch('/api/contacts', { headers: authHeaders() });
+    if (res.status === 401) { c.innerHTML = '<p class="hint" style="color:#94a3b8;">未登录</p>'; return; }
+    const list = await res.json();
+    if (!list.length) { c.innerHTML = '<p class="hint" style="color:#94a3b8;">暂无留言</p>'; return; }
+    c.innerHTML = list.map(m => `
+      <div class="contact-item">
+        <div class="meta">${esc(m.time)} · ${esc(m.name)} · ${esc(m.subject)} · <span style="color:#2563eb;">${esc(m.email)}</span></div>
+        <div>${esc(m.content)}</div>
+        <button class="admin-btn danger" data-delmsg="${m.id}" style="margin-top:8px;">删除</button>
+      </div>`).join('');
+    c.querySelectorAll('[data-delmsg]').forEach(b => b.addEventListener('click', async () => {
+      await fetch('/api/contacts/' + b.dataset.delmsg, { method: 'DELETE', headers: authHeaders() });
+      loadContacts();
+    }));
+  } catch (e) { c.innerHTML = '<p class="hint" style="color:#94a3b8;">加载失败</p>'; }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+function esc(s) { return s == null ? '' : String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+// ---------- 启动 ----------
+if (TOKEN) {
+  document.getElementById('loginBox').style.display = 'none';
+  document.getElementById('adminFrame').style.display = 'flex';
+  loadConfig();
+  loadContacts();
+}
+bindGlobal();

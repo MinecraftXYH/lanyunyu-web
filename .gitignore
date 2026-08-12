@@ -4,6 +4,7 @@ node_modules/
 .DS_Store
 contacts.json
 assets/downloads/*.mp4
+public/assets/downloads/*.mp4
 # 临时/探测残留（可手动删除，不影响部署）
 pc_help.txt
 zeabur
