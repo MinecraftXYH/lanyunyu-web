@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>下载 · 蓝云屿</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="index.html"><img class="logo" src="assets/images/logo.png" alt="蓝云屿 logo" /> 蓝云屿</a>
+      <button class="nav-toggle" id="navToggle">菜单</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">首页</a>
+        <a href="about.html">介绍</a>
+        <a href="download.html" class="active">下载</a>
+        <a href="index.html#community">社区</a>
+        <a href="index.html#contact">联系</a>
+      </div>
+    </div>
+  </nav>
+
+  <div style="height:90px;"></div>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>下载资源</h2>
+        <p>选择适合你的版本，按提示进服即可</p>
+      </div>
+      <div class="dl-list" id="dlList"></div>
+
+      <div class="glass video-card" id="videoCard">
+        <div class="video-head">
+          <h3 style="margin:0;">📹 服务器安装教程（新手必看）</h3>
+        </div>
+        <div class="video-player-wrap" id="tutorialPlayer"></div>
+        <p class="hint" style="color:var(--muted); margin:12px 0 0;">视频包含 Java 安装、启动器配置、进服完整流程，点击即可在线观看。</p>
+      </div>
+
+      <div class="glass" style="padding:26px; margin-top:26px;">
+        <h3 style="margin-top:0;">进服小贴士</h3>
+        <p class="hint" style="color:var(--muted); margin:0;">确保客户端版本与服务器一致（当前 <span id="dlVer">26.1.2</span>）。26.1.2 可与其他版本互通（需高版本）。若使用整合包仍连不上，请检查 IP 是否填写正确，或到 QQ 群求助。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container"><p>© 蓝云屿 Minecraft 服务器 · 用心建一座岛</p></div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

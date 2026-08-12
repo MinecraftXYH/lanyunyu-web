@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理后台 · 蓝云屿</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body class="admin-body">
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="index.html"><img class="logo" src="assets/images/logo.png" alt="蓝云屿 logo" /> 蓝云屿 · 后台</a>
+      <div class="nav-links"><a href="index.html">返回前台</a></div>
+    </div>
+  </nav>
+
+  <!-- Login -->
+  <div class="login-box" id="loginBox">
+    <h2>🔐 后台登录</h2>
+    <div class="admin-field"><label>账号</label><input type="text" id="userInput" placeholder="请输入账号" value="admin" /></div>
+    <div class="admin-field"><label>密码</label><input type="password" id="pwdInput" placeholder="请输入密码" /></div>
+    <button class="admin-btn primary" id="loginBtn" style="width:100%;">进入后台</button>
+    <p id="loginErr" style="color:#dc2626; margin-top:10px; display:none;">账号或密码错误</p>
+  </div>
+
+  <!-- Panel -->
+  <div class="admin-frame" id="adminFrame" style="display:none;">
+    <aside class="admin-sidebar">
+      <a href="#sec-server" class="active">⚙️ 服务器信息</a>
+      <a href="#sec-hero">🏠 首页设置</a>
+      <a href="#sec-features">🌟 玩法特色</a>
+      <a href="#sec-steps">🚶 加入步骤</a>
+      <a href="#sec-community">💬 社区设置</a>
+      <a href="#sec-shots">🖼️ 游戏截图</a>
+      <a href="#sec-contact">📧 联系我们</a>
+      <a href="#sec-downloads">📦 下载资源</a>
+      <a href="#sec-news">📢 公告动态</a>
+      <a href="#sec-players">🧑 玩家名册</a>
+      <a href="#sec-messages">📨 联系留言</a>
+      <a href="#sec-settings">🔑 设置</a>
+    </aside>
+
+    <main class="admin-main">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+        <h2 style="margin:0;">内容管理</h2>
+        <div style="display:flex; gap:10px;">
+          <button class="admin-btn" id="resetBtn" style="background:#e2e8f0; color:#334155;">重置为服务器值</button>
+          <button class="admin-btn primary" id="saveBtn">💾 保存更改</button>
+          <button class="admin-btn" id="logoutBtn" style="background:#f1f5f9; color:#334155;">退出</button>
+        </div>
+      </div>
+      <p class="hint" style="color:#64748b; margin-top:-10px; margin-bottom:20px;">修改后点击「保存更改」会直接写入服务器 data.json，前台立即生效。</p>
+
+      <section class="admin-card" id="sec-server">
+        <h3>⚙️ 服务器信息</h3>
+        <div class="admin-row" id="serverFields"></div>
+        <div class="admin-row" style="margin-top:14px;">
+          <div class="admin-field"><label>在线状态（true/false）</label><input type="text" data-bind="server|status|online" /></div>
+          <div class="admin-field"><label>当前在线人数</label><input type="text" data-bind="server|status|players" /></div>
+          <div class="admin-field"><label>最大人数</label><input type="text" data-bind="server|status|maxPlayers" /></div>
+        </div>
+      </section>
+
+      <section class="admin-card" id="sec-hero">
+        <h3>🏠 首页设置</h3>
+        <div id="heroFields"></div>
+      </section>
+
+      <section class="admin-card" id="sec-features">
+        <h3>🌟 玩法特色</h3>
+        <div id="featuresList"></div>
+        <button class="admin-btn" data-add="features">+ 添加特色</button>
+      </section>
+
+      <section class="admin-card" id="sec-steps">
+        <h3>🚶 加入步骤</h3>
+        <div id="stepsList"></div>
+        <button class="admin-btn" data-add="steps">+ 添加步骤</button>
+      </section>
+
+      <section class="admin-card" id="sec-community">
+        <h3>💬 社区设置</h3>
+        <div class="admin-row" id="communityFields"></div>
+        <div class="admin-row" style="margin-top:14px;">
+          <div class="admin-field"><label>QQ 群号</label><input type="text" data-bind="server|qqGroup" /></div>
+          <div class="admin-field"><label>QQ 加群链接</label><input type="text" data-bind="server|qqGroupLink" placeholder="https://qm.qq.com/..." /></div>
+          <div class="admin-field"><label>二维码图片路径</label><input type="text" data-bind="server|qqQr" placeholder="assets/images/qq-qr.png" /></div>
+        </div>
+      </section>
+
+      <section class="admin-card" id="sec-shots">
+        <h3>🖼️ 游戏截图</h3>
+        <p class="hint" style="color:#64748b;">src 填写图片地址（可放网站 images 目录下，如 assets/images/shot1.jpg）。</p>
+        <div id="screenshotsList"></div>
+        <button class="admin-btn" data-add="screenshots">+ 添加截图</button>
+      </section>
+
+      <section class="admin-card" id="sec-contact">
+        <h3>📧 联系我们</h3>
+        <div class="admin-row" id="contactFields"></div>
+        <div class="admin-field"><label>可选主题（用英文逗号分隔）</label><input type="text" data-bind="contact|subjectsCsv" placeholder="一般咨询,Bug 反馈,举报违规" /></div>
+        <div class="admin-field"><label>填写指南（每行一条）</label><textarea data-bind="contact|guideCsv" placeholder="每行一条说明"></textarea></div>
+      </section>
+
+      <section class="admin-card" id="sec-downloads">
+        <h3>📦 下载资源</h3>
+        <div id="downloadsList"></div>
+        <button class="admin-btn" data-add="downloads">+ 添加资源</button>
+      </section>
+
+      <section class="admin-card" id="sec-news">
+        <h3>📢 公告动态</h3>
+        <div id="announcementsList"></div>
+        <button class="admin-btn" data-add="announcements">+ 添加公告</button>
+      </section>
+
+      <section class="admin-card" id="sec-players">
+        <h3>🧑 玩家名册</h3>
+        <div id="playersList"></div>
+        <button class="admin-btn" data-add="players">+ 添加玩家</button>
+      </section>
+
+      <section class="admin-card" id="sec-messages">
+        <h3>📨 联系留言</h3>
+        <p class="hint" style="color:#64748b;">前台「联系我们」表单提交的内容会显示在这里。</p>
+        <div id="contactsList"><p class="hint" style="color:#94a3b8;">加载中…</p></div>
+        <button class="admin-btn" id="refreshMsg" style="background:#e2e8f0; color:#334155; margin-top:8px;">刷新留言</button>
+      </section>
+
+      <section class="admin-card" id="sec-settings">
+        <h3>🔑 设置</h3>
+        <div class="admin-field"><label>修改后台密码</label><input type="password" id="newPwd" placeholder="留空则不修改" /></div>
+        <p class="hint" style="color:#64748b;">提示：本后台为简单鉴权，密码仅作基础保护，请勿在留言中收集敏感隐私信息。</p>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">已保存</div>
+
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>

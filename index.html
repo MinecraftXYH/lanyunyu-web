@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>蓝云屿 · Minecraft 服务器</title>
+  <meta name="description" content="蓝云屿 —— 一处浮于云海之上的方块乐土。26.1.2 原版生存，版本互通，腐竹 Minecraft_SCX。" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="index.html"><img class="logo" src="assets/images/logo.png" alt="蓝云屿 logo" /> 蓝云屿</a>
+      <button class="nav-toggle" id="navToggle">菜单</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html" class="active">首页</a>
+        <a href="about.html">介绍</a>
+        <a href="download.html">下载</a>
+        <a href="#community">社区</a>
+        <a href="#contact">联系</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+      <div class="hero-announce"><span class="dot"></span><span id="heroAnnounce">现在游玩就送点券大礼包！</span></div>
+      <h1 id="heroTitle"><span class="title-prefix">欢迎来到</span><br><span class="accent">蓝云屿</span></h1>
+      <p class="hero-desc" id="heroDesc">由专业团队倾力打造的大型多人在线生存服务器，为你带来高质量的 26.1.2 原版生存体验。</p>
+      <div class="hero-tags" id="heroTags"></div>
+      <div class="hero-btns">
+        <button class="btn btn-primary" id="copyIp">📋 复制 IP 地址</button>
+        <a class="btn btn-glass" href="#community">💬 加入社区</a>
+      </div>
+      <div class="status-line" id="statusLine">
+        <span><span class="dot" id="stDot"></span><span id="stText">服务器状态查询中…</span></span>
+        <span>版本：<strong id="stVer">26.1.2</strong></span>
+        <span>在线：<strong id="stPlayers">—</strong> / <strong id="stMax">—</strong></span>
+        <span>腐竹：<strong id="stOwner">Minecraft_SCX</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Features -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>玩法特色</h2>
+        <p>我们想做的，是一个让人愿意慢慢待下去的服务器</p>
+      </div>
+      <div class="grid" id="featureGrid"></div>
+    </div>
+  </section>
+
+  <!-- Join Steps -->
+  <section class="section" style="background: rgba(0,0,0,.2);">
+    <div class="container">
+      <div class="section-head">
+        <h2>三步加入我们</h2>
+        <p>从零到进服，只需几分钟</p>
+      </div>
+      <div class="steps" id="stepList"></div>
+    </div>
+  </section>
+
+  <!-- Community -->
+  <section class="section" id="community">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="commTitle">加入社区</h2>
+        <p id="commSubtitle">扫码或搜索群号，和更多玩家一起探索蓝云屿</p>
+      </div>
+      <div class="community-grid">
+        <div class="glass comm-card qq-invite">
+          <div class="qq-header">
+            <img id="qqLogo" class="qq-avatar" src="assets/images/logo.png" alt="蓝云屿 logo" />
+            <div class="qq-meta">
+              <div id="qqServerName" class="qq-server">Minecraft蓝云屿</div>
+              <div id="qqName" class="qq-label">官方 QQ 群</div>
+            </div>
+          </div>
+          <div class="qr" id="qqQrWrap"><img id="qqQr" src="assets/images/qq-qr.png" alt="QQ 群二维码" /></div>
+          <div class="qq-num">群号：<strong id="qqNum">1044431401</strong></div>
+          <p id="qqDesc" class="qq-desc">与其他玩家实时交流，获取最新公告与帮助</p>
+          <a class="btn btn-primary" id="qqBtn" href="#" target="_blank" rel="noopener">点击加入群聊</a>
+        </div>
+        <div class="glass comm-card news-card">
+          <h3>最新公告</h3>
+          <div id="newsList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots -->
+  <section class="section" id="screenshots">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="shotTitle">游戏截图</h2>
+        <p id="shotSubtitle">玩家在蓝云屿留下的精彩瞬间</p>
+      </div>
+      <div class="shots-grid" id="shotsGrid"></div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section" id="contact" style="background: rgba(0,0,0,.2);">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="contactTitle">联系我们</h2>
+        <p id="contactSubtitle">有任何问题或建议？通过邮件直接联系服主</p>
+      </div>
+      <div class="contact-wrap">
+        <div class="glass contact-form">
+          <div class="contact-row">
+            <div class="field"><label>您的昵称 / 游戏 ID</label><input type="text" id="cName" placeholder="请输入游戏 ID 或昵称" /></div>
+            <div class="field"><label>联系邮箱</label><input type="email" id="cEmail" placeholder="用于接收回复的邮箱地址" /></div>
+          </div>
+          <div class="field">
+            <label>主题</label>
+            <select id="cSubject"></select>
+          </div>
+          <div class="field">
+            <label>详细内容</label>
+            <textarea id="cContent" placeholder="请详细描述您遇到的问题…"></textarea>
+          </div>
+          <button class="btn btn-primary" id="cSubmit" style="width:100%;">发送邮件 ➤</button>
+          <p class="hint" id="cHint" style="color:var(--muted); font-size:.85rem; margin-top:10px; display:none;"></p>
+        </div>
+        <div class="glass contact-guide">
+          <h4>📧 邮件填写指南</h4>
+          <ol id="contactGuide"></ol>
+          <div class="warn-box">
+            注：恶意骚扰或发送垃圾邮件将被永久拉黑。
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>© 蓝云屿 Minecraft 服务器 · 用心建一座岛</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

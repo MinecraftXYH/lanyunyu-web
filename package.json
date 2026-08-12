@@ -1,0 +1,14 @@
+{
+  "name": "lanyunyu-web",
+  "version": "1.0.0",
+  "description": "蓝云屿 Minecraft 服务器官网（Node 零依赖后端）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true
+}
