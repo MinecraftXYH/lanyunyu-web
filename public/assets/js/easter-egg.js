@@ -130,29 +130,49 @@
   function showThanks() {
     const el = document.createElement('div');
     el.id = 'egg-thanks';
-    el.textContent = '谢谢你们！';
     Object.assign(el.style, {
       position: 'fixed', left: '50%', top: '50%',
-      transform: 'translate(-50%,-50%) scale(0.6)',
-      fontFamily: '"ZCOOL KuaiLe", sans-serif',
+      transform: 'translate(-50%,-50%)',
+      fontFamily: '"ZCOOL KuaiLe", "Microsoft YaHei", sans-serif',
       fontSize: 'clamp(2.5rem, 9vw, 5.5rem)',
       fontWeight: '900',
       color: '#fff',
-      textShadow: '0 0 30px rgba(59,220,136,.9), 0 0 60px rgba(74,168,255,.7)',
-      zIndex: '100002', pointerEvents: 'none',
-      opacity: '0',
-      transition: 'opacity .6s ease, transform .6s cubic-bezier(.2,1.4,.4,1)'
+      display: 'flex', gap: '0.04em',
+      zIndex: '100002', pointerEvents: 'none'
     });
     document.body.appendChild(el);
-    requestAnimationFrame(function () {
-      el.style.opacity = '1';
-      el.style.transform = 'translate(-50%,-50%) scale(1)';
+
+    const text = '谢谢你们！';
+    const spans = text.split('').map(function (ch) {
+      const s = document.createElement('span');
+      s.textContent = ch;
+      Object.assign(s.style, {
+        display: 'inline-block',
+        opacity: '0',
+        transform: 'translateY(45px) scale(0.3) rotate(-8deg)',
+        textShadow: '0 0 30px rgba(59,220,136,.9), 0 0 60px rgba(74,168,255,.7)',
+        transition: 'opacity .5s ease, transform .65s cubic-bezier(.2,1.6,.35,1)'
+      });
+      el.appendChild(s);
+      return s;
     });
+
+    // 逐字错落弹入（下方浮起 + 弹性放大）
+    spans.forEach(function (s, i) {
+      setTimeout(function () {
+        s.style.opacity = '1';
+        s.style.transform = 'translateY(0) scale(1) rotate(0deg)';
+      }, 120 + i * 140);
+    });
+
+    // 全部出现后停留约 2.2s，再整体柔和放大淡出
+    const total = 120 + spans.length * 140;
     setTimeout(function () {
+      el.style.transition = 'opacity .8s ease, transform .8s ease';
       el.style.opacity = '0';
       el.style.transform = 'translate(-50%,-50%) scale(1.12)';
-      setTimeout(function () { el.remove(); }, 700);
-    }, 2600);
+      setTimeout(function () { el.remove(); }, 850);
+    }, total + 2200);
   }
 
   // ---------------- Konami 秘籍 ----------------
