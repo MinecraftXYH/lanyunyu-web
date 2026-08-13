@@ -98,6 +98,10 @@ node server.js
 ## 故障排查
 
 - **后台登录提示失败**：检查 Vercel → Settings → Environment Variables 里 `LYY_ADMIN_USER` 和 `LYY_ADMIN_PWD` 是否设置正确（默认 admin / lyy20260701）
-- **保存配置失败 / 留言提交失败**：检查 `GITHUB_TOKEN` 是否有效（PAT 没过期、勾了 repo 权限）
+- **保存配置失败 / 留言提交失败**：
+  1. 登录后台后，如果顶部提示「未配置 GITHUB_TOKEN」，说明环境变量没加。
+  2. 去 Vercel 项目 → **Settings → Environment Variables** → 添加 `GITHUB_TOKEN` = 你的 GitHub PAT。
+  3. 点 **Redeploy** 重新部署（环境变量修改后必须重新部署才生效）。
+  4. 重新登录后台再试。
 - **看不到最新内容**：Vercel 部署会自动跑，重新部署后浏览器硬刷新 `Ctrl+Shift+R`
 - **GitHub API 速率限制**：默认 5000 次/小时，远超你站点的用量，无需担心
