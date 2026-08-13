@@ -22,11 +22,11 @@ function cors(res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
 
-function ok(res, data) {
+function ok(res, data, cacheControl) {
   cors(res);
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  res.setHeader('Cache-Control', cacheControl || 'no-store, no-cache, must-revalidate, max-age=0');
   res.end(JSON.stringify(data));
 }
 

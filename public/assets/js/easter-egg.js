@@ -54,7 +54,8 @@
       boxShadow: '0 0 8px ' + color + ', 0 0 16px ' + color,
       opacity: '1',
       transform: 'translate(-50%, -50%)',
-      transition: 'opacity .05s linear'
+      transition: 'opacity .05s linear',
+      willChange: 'transform, opacity'
     });
     container.appendChild(p);
 
@@ -70,8 +71,8 @@
       vx *= 0.98; // 空气阻力
       life -= 0.014;
       if (life <= 0) { p.remove(); return; }
-      p.style.left = px + 'px';
-      p.style.top = py + 'px';
+      // translate3d 走合成器，避免每帧重排
+      p.style.transform = 'translate3d(calc(-50% + ' + (px - x) + 'px), calc(-50% + ' + (py - y) + 'px), 0)';
       p.style.opacity = life;
       requestAnimationFrame(step);
     }

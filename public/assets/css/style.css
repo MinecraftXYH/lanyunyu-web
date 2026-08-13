@@ -37,6 +37,8 @@ body::before {
     linear-gradient(rgba(7, 11, 20, 0.30), rgba(7, 11, 20, 0.30)),
     url("../images/page-bg.jpg") center/cover no-repeat;
   background-color: #070b14;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 a { color: inherit; text-decoration: none; }

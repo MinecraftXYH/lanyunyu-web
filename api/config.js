@@ -10,7 +10,8 @@ module.exports = async (req, res) => {
   }
   if (req.method === 'GET') {
     const data = await readJSON('data.json', {});
-    return ok(res, data);
+    // GET 配置允许 Vercel Edge 缓存 30s，减少每次请求都打 GitHub API 的冷启动延迟
+    return ok(res, data, 'public, max-age=5, s-maxage=30, stale-while-revalidate=300');
   }
   if (req.method === 'POST') {
     if (!isAdmin(req)) return fail(res, 401, '未登录或密码错误');
