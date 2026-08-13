@@ -74,7 +74,12 @@
     "qqDesc": "与其他玩家实时交流，获取最新公告与帮助",
     "qqBtn": "点击加入群聊"
   },
-  "screenshots": [],
+  "screenshots": [
+    {
+      "src": "https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEZD7lqfR5kn8-u8GlpR1-kUynv5_QbBwACaSoAAkWI6FeQRvrYStJhFT0E.jpg",
+      "caption": ""
+    }
+  ],
   "contact": {
     "title": "联系我们",
     "subtitle": "有任何问题或建议？通过邮件直接联系服主",
@@ -128,6 +133,11 @@
       "name": "Minecraft_SCX",
       "role": "腐竹",
       "note": "服务器主理人"
+    },
+    {
+      "name": "",
+      "role": "管理",
+      "note": ""
     }
   ],
   "tutorial": {
