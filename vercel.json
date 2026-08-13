@@ -4,5 +4,19 @@
   "rewrites": [
     { "source": "/(.*\\.html)", "destination": "/public/$1" },
     { "source": "/assets/(.*)", "destination": "/public/assets/$1" }
-  ]
+  ],
+  "functions": {
+    "api/config.js": {
+      "includeFiles": "api/data.json"
+    },
+    "api/contact.js": {
+      "includeFiles": "api/data.json"
+    },
+    "api/contacts.js": {
+      "includeFiles": "api/contacts.json"
+    },
+    "api/contacts/[id].js": {
+      "includeFiles": "api/contacts.json"
+    }
+  }
 }

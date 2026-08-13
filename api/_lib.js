@@ -7,8 +7,12 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
+// 让 Vercel 打包器识别到这两个 JSON 文件，确保本地兜底可用
+require.resolve('./data.json');
+require.resolve('./contacts.json');
+
 const GITHUB_REPO = process.env.GITHUB_REPO || 'MinecraftXYH/lanyunyu-web';
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'master';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const ADMIN_USER = process.env.LYY_ADMIN_USER || 'admin';
 const ADMIN_PWD = process.env.LYY_ADMIN_PWD || 'lyy20260701';
