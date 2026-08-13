@@ -27,8 +27,8 @@ body {
   line-height: 1.65;
   min-height: 100vh;
 }
-/* 全局背景图（只给 hero 以外板块用）；hero 通过 z-index 独立覆盖，不受此层影响 */
-body::before {
+/* 全局背景图（只给前台 hero 以外板块用）；后台 admin-body 不使用夜景背景 */
+body:not(.admin-body)::before {
   content: '';
   position: fixed;
   inset: 0;
