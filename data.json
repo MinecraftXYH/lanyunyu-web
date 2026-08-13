@@ -74,28 +74,7 @@
     "qqDesc": "与其他玩家实时交流，获取最新公告与帮助",
     "qqBtn": "点击加入群聊"
   },
-  "screenshots": {
-    "title": "游戏截图",
-    "subtitle": "玩家在蓝云屿留下的精彩瞬间",
-    "items": [
-      {
-        "src": "",
-        "caption": "截图占位 1"
-      },
-      {
-        "src": "",
-        "caption": "截图占位 2"
-      },
-      {
-        "src": "",
-        "caption": "截图占位 3"
-      },
-      {
-        "src": "",
-        "caption": "截图占位 4"
-      }
-    ]
-  },
+  "screenshots": [],
   "contact": {
     "title": "联系我们",
     "subtitle": "有任何问题或建议？通过邮件直接联系服主",
@@ -149,11 +128,6 @@
       "name": "Minecraft_SCX",
       "role": "腐竹",
       "note": "服务器主理人"
-    },
-    {
-      "name": "云朵工程师",
-      "role": "管理",
-      "note": "生电区与红石把关"
     }
   ],
   "tutorial": {
