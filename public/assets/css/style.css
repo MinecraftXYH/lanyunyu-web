@@ -34,7 +34,7 @@ body::before {
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(rgba(7, 11, 20, 0.45), rgba(7, 11, 20, 0.45)),
+    linear-gradient(rgba(7, 11, 20, 0.30), rgba(7, 11, 20, 0.30)),
     url("../images/page-bg.jpg") center/cover no-repeat;
   background-color: #070b14;
 }
@@ -125,7 +125,7 @@ img { max-width: 100%; display: block; }
   content: '';
   position: absolute; inset: 0; z-index: -1;
   background:
-    linear-gradient(180deg, rgba(7,11,20,.35) 0%, rgba(7,11,20,.12) 40%, rgba(7,11,20,.42) 100%);
+    linear-gradient(180deg, rgba(7,11,20,.22) 0%, rgba(7,11,20,.06) 40%, rgba(7,11,20,.28) 100%);
 }
 .hero .container { position: relative; z-index: 1; }
 .hero-announce {
