@@ -12,7 +12,7 @@
     "qqQr": "assets/images/qq-qr.png",
     "status": {
       "online": true,
-      "players": 0,
+      "players": 1,
       "maxPlayers": 2026
     }
   },
