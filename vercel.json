@@ -17,6 +17,15 @@
     },
     "api/contacts/[id].js": {
       "includeFiles": "api/contacts.json"
+    },
+    "api/register.js": {
+      "includeFiles": "api/users.json"
+    },
+    "api/auth.js": {
+      "includeFiles": "api/users.json"
+    },
+    "api/me.js": {
+      "includeFiles": "api/users.json"
     }
   }
 }

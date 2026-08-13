@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>玩家中心 · 蓝云屿</title>
+  <link rel="stylesheet" href="assets/css/style.css?v=8" />
+  <link rel="icon" type="image/png" href="assets/images/logo.png?v=3" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="index.html"><img class="logo" src="assets/images/logo.png" alt="蓝云屿 logo" /> 蓝云屿</a>
+      <div class="nav-links">
+        <a href="index.html">首页</a>
+        <a href="about.html">介绍</a>
+        <a href="download.html">下载</a>
+        <a href="account.html" class="active">玩家中心</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding-top:110px; padding-bottom:80px; max-width:520px;">
+    <h1 style="text-align:center; margin-bottom:6px;">玩家中心</h1>
+    <p class="hint" style="text-align:center; margin-bottom:28px;">注册一个账号，绑定你的 QQ，未来可解锁专属内容</p>
+
+    <!-- 未登录：登录/注册 -->
+    <div id="authPanel">
+      <div class="glass-card">
+        <div class="tab-row" style="display:flex; gap:8px; margin-bottom:20px;">
+          <button class="tab-btn active" id="tabLogin">登录</button>
+          <button class="tab-btn" id="tabReg">注册</button>
+        </div>
+
+        <form id="loginForm">
+          <div class="field"><label>用户名</label><input type="text" id="loginUser" placeholder="请输入用户名" autocomplete="username" /></div>
+          <div class="field"><label>密码</label><input type="password" id="loginPwd" placeholder="请输入密码" autocomplete="current-password" /></div>
+          <p class="err" id="loginErr"></p>
+          <button class="btn btn-primary" style="width:100%;" id="loginBtn">登录</button>
+        </form>
+
+        <form id="regForm" style="display:none;">
+          <div class="field"><label>用户名（3-20 位，中英文/数字/下划线）</label><input type="text" id="regUser" placeholder="给自己起个名字" autocomplete="username" /></div>
+          <div class="field"><label>密码（至少 6 位）</label><input type="password" id="regPwd" placeholder="设置登录密码" autocomplete="new-password" /></div>
+          <div class="field"><label>QQ 号（选填，方便联系）</label><input type="text" id="regQq" placeholder="选填" inputmode="numeric" /></div>
+          <p class="err" id="regErr"></p>
+          <button class="btn btn-primary" style="width:100%;" id="regBtn">注册并登录</button>
+        </form>
+      </div>
+      <p class="hint" style="text-align:center; margin-top:16px;">还没有 QQ 互联登录？后续版本将支持一键 QQ 登录。</p>
+    </div>
+
+    <!-- 已登录：个人中心 -->
+    <div id="userPanel" style="display:none;">
+      <div class="glass-card">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+          <div class="avatar" id="userAvatar">玩</div>
+          <div>
+            <div style="font-size:1.3rem; font-weight:800;" id="userName">—</div>
+            <div class="hint" id="userCreated"></div>
+          </div>
+        </div>
+
+        <h3 style="margin:0 0 14px;">修改资料</h3>
+        <form id="profileForm">
+          <div class="field"><label>QQ 号</label><input type="text" id="profileQq" placeholder="选填" inputmode="numeric" /></div>
+          <div class="field"><label>原密码（改密码时必填）</label><input type="password" id="profileOld" placeholder="不修改密码可留空" autocomplete="current-password" /></div>
+          <div class="field"><label>新密码（至少 6 位，留空则不改）</label><input type="password" id="profileNew" placeholder="留空则不改密码" autocomplete="new-password" /></div>
+          <p class="err" id="profileErr"></p>
+          <p class="ok-msg" id="profileOk"></p>
+          <button class="btn btn-primary" style="width:100%;" id="profileBtn">保存修改</button>
+        </form>
+        <button class="btn btn-glass" style="width:100%; margin-top:12px;" id="logoutBtn">退出登录</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast">已保存</div>
+
+  <script src="assets/js/account.js?v=1"></script>
+</body>
+</html>
