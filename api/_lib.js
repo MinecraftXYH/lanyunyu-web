@@ -29,6 +29,7 @@ function ok(res, data) {
   cors(res);
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
   res.end(JSON.stringify(data));
 }
 
