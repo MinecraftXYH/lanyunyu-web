@@ -143,7 +143,7 @@ function renderAbout() {
   if (ap && DATA.players) {
     ap.innerHTML = DATA.players.map(p => `
       <div class="glass" style="padding:16px; display:flex; gap:12px; align-items:center;">
-        <div class="avatar" style="width:44px;height:44px;border-radius:10px;flex:none;background:linear-gradient(135deg,var(--blue),var(--accent));display:grid;place-items:center;font-weight:800;color:#06203f;">${(p.name||'?').slice(0,1)}</div>
+        <img class="avatar" src="assets/images/player-avatar.jpeg" alt="${esc(p.name)}" style="width:44px;height:44px;border-radius:10px;flex:none;object-fit:cover;border:1px solid var(--glass-border);" />
         <div><div style="font-weight:700;">${esc(p.name)}</div><div class="role" style="color:var(--accent);font-size:.85rem;">${esc(p.role||'')}</div><div class="hint" style="color:var(--muted);">${esc(p.note||'')}</div></div>
       </div>`).join('');
   }
