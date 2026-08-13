@@ -77,7 +77,10 @@ async function writeRepoFile(path, contentObj, message, sha) {
   });
   if (!r.ok) {
     const text = await r.text();
-    throw new Error('GitHub 写失败: ' + r.status + ' ' + text.slice(0, 200));
+    let hint = '';
+    if (r.status === 404) hint = '（请检查 Vercel 环境变量 GITHUB_TOKEN / GITHUB_REPO / GITHUB_BRANCH 是否正确，并重新 Deploy）';
+    if (r.status === 401 || r.status === 403) hint = '（GITHUB_TOKEN 无效或权限不足，请确认 token 勾选了 repo 权限）';
+    throw new Error('GitHub 写失败: ' + r.status + ' ' + text.slice(0, 200) + ' ' + hint);
   }
   return await r.json();
 }

@@ -61,7 +61,29 @@ function renderCommunity() {
   setText('qqDesc', c.qqDesc);
   setText('qqNum', s.qqGroup);
   const btn = el('qqBtn');
-  if (btn) btn.href = s.qqGroupLink || '#';
+  if (btn) {
+    const link = (s.qqGroupLink || '').trim();
+    const hasWebLink = /^https?:\/\/qm\.qq\.com\/.+/i.test(link) && !link.endsWith('k=');
+    const hasProtoLink = /^tencent:\/\//i.test(link);
+    if (hasWebLink || hasProtoLink) {
+      btn.href = link;
+      btn.target = hasWebLink ? '_blank' : '_self';
+      btn.onclick = null;
+    } else {
+      // 没有有效链接时，点击复制群号
+      btn.href = '#';
+      btn.target = '_self';
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const num = s.qqGroup || '1044431401';
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(num).then(() => alert('QQ群号已复制：' + num + '，请打开 QQ 搜索加入。'));
+        } else {
+          alert('QQ群号：' + num + '，请手动搜索加入。');
+        }
+      };
+    }
+  }
   const qr = el('qqQr');
   if (qr && s.qqQr) qr.src = s.qqQr;
   const logo = el('qqLogo');

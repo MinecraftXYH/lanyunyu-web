@@ -203,9 +203,22 @@ async function doLogin() {
     document.getElementById('adminFrame').style.display = 'flex';
     loadConfig();
     loadContacts();
+    checkHealth();
   } else {
     document.getElementById('loginErr').style.display = 'block';
   }
+}
+
+async function checkHealth() {
+  try {
+    const res = await fetch('/api/health', { headers: authHeaders() });
+    const h = await res.json();
+    if (!h.githubConfigured) {
+      toast('⚠️ 未配置 GITHUB_TOKEN，保存功能不可用');
+    } else if (!h.githubReadable) {
+      toast('⚠️ GITHUB_TOKEN 无法访问仓库：' + (h.githubMsg || '请检查权限'));
+    }
+  } catch (e) { /* ignore */ }
 }
 
 async function loadConfig(silent) {
@@ -213,7 +226,7 @@ async function loadConfig(silent) {
     const res = await fetch('/api/config', { headers: authHeaders() });
     EDIT = await res.json();
     renderAllForms();
-  } catch (e) { toast('读取配置失败'); }
+  } catch (e) { toast('读取配置失败：' + e.message); }
 }
 
 async function doSave() {
