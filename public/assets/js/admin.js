@@ -95,10 +95,24 @@ function field(path, label, value, isTextarea) {
 function escAttr(s) { return String(s).replace(/"/g, '&quot;'); }
 
 // 把 CSV 转数组 / 数组转 CSV，用于 contact.subjects、contact.guide、hero.tags
+function ensureArray(v, label) {
+  if (v == null) return [];
+  if (Array.isArray(v)) return v;
+  if (typeof v === 'string') return v.split(/[,，\n]/).map(s => s.trim()).filter(Boolean);
+  console.warn(`[admin] 字段 ${label} 不是数组，已重置为空数组`, v);
+  return [];
+}
 function prepareCsv(obj) {
-  if (obj.hero && obj.hero.tagsCsv == null) obj.hero.tagsCsv = (obj.hero.tags || []).join(',');
-  if (obj.contact && obj.contact.subjectsCsv == null) obj.contact.subjectsCsv = (obj.contact.subjects || []).join(',');
-  if (obj.contact && obj.contact.guideCsv == null) obj.contact.guideCsv = (obj.contact.guide || []).join('\n');
+  if (obj.hero && typeof obj.hero === 'object') {
+    obj.hero.tags = ensureArray(obj.hero.tags, 'hero.tags');
+    if (obj.hero.tagsCsv == null) obj.hero.tagsCsv = obj.hero.tags.join(',');
+  }
+  if (obj.contact && typeof obj.contact === 'object') {
+    obj.contact.subjects = ensureArray(obj.contact.subjects, 'contact.subjects');
+    obj.contact.guide = ensureArray(obj.contact.guide, 'contact.guide');
+    if (obj.contact.subjectsCsv == null) obj.contact.subjectsCsv = obj.contact.subjects.join(',');
+    if (obj.contact.guideCsv == null) obj.contact.guideCsv = obj.contact.guide.join('\n');
+  }
 }
 function restoreCsv(obj) {
   if (obj.hero && obj.hero.tagsCsv != null) obj.hero.tags = obj.hero.tagsCsv.split(',').map(s => s.trim()).filter(Boolean);
@@ -117,7 +131,11 @@ function renderTop(key, containerId) {
 function renderRepeat(key, containerId) {
   const c = document.getElementById(containerId);
   if (!c) return;
-  const arr = EDIT[key] || (EDIT[key] = []);
+  let arr = EDIT[key];
+  if (!Array.isArray(arr)) {
+    console.warn(`[admin] 配置字段 ${key} 不是数组，已重置为空数组`, arr);
+    arr = EDIT[key] = [];
+  }
   c.innerHTML = arr.map((it, i) => `
     <div class="repeat-card" data-idx="${i}">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -125,18 +143,22 @@ function renderRepeat(key, containerId) {
         <button class="admin-btn danger" data-del="${key}" data-i="${i}">删除</button>
       </div>
       <div class="admin-row">
-        ${REPEAT_SCHEMA[key].map(f => field([key, i, f.k], f.label, it[f.k], f.k === 'desc' || f.k === 'content' || f.k === 'note')).join('')}
+        ${REPEAT_SCHEMA[key].map(f => field([key, i, f.k], f.label, it && it[f.k], f.k === 'desc' || f.k === 'content' || f.k === 'note')).join('')}
       </div>
     </div>`).join('');
 }
 
 function renderAllForms() {
   prepareCsv(EDIT);
-  renderTop('server', 'serverFields');
-  renderTop('hero', 'heroFields');
-  renderTop('community', 'communityFields');
-  renderTop('contact', 'contactFields');
-  for (const k in REPEAT_SCHEMA) renderRepeat(k, k + 'List');
+  const safeRender = (fn, ...args) => {
+    try { fn(...args); }
+    catch (e) { console.error('[admin] 渲染失败', fn.name, args, e); toast('渲染失败：' + e.message); }
+  };
+  safeRender(renderTop, 'server', 'serverFields');
+  safeRender(renderTop, 'hero', 'heroFields');
+  safeRender(renderTop, 'community', 'communityFields');
+  safeRender(renderTop, 'contact', 'contactFields');
+  for (const k in REPEAT_SCHEMA) safeRender(renderRepeat, k, k + 'List');
   populateBinds();
 }
 
@@ -224,9 +246,18 @@ async function checkHealth() {
 async function loadConfig(silent) {
   try {
     const res = await fetch('/api/config', { headers: authHeaders() });
-    EDIT = await res.json();
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error('服务器返回 ' + res.status + '：' + text.slice(0, 120));
+    }
+    const data = await res.json();
+    if (!data || typeof data !== 'object') throw new Error('返回数据不是对象');
+    EDIT = data;
     renderAllForms();
-  } catch (e) { toast('读取配置失败：' + e.message); }
+  } catch (e) {
+    toast('读取配置失败：' + e.message);
+    console.error('[admin] loadConfig error', e);
+  }
 }
 
 async function doSave() {
