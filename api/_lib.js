@@ -7,9 +7,6 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-// 让 Vercel 打包器识别到这两个 JSON 文件，确保本地兜底可用
-require.resolve('./data.json');
-require.resolve('./contacts.json');
 
 const GITHUB_REPO = process.env.GITHUB_REPO || 'MinecraftXYH/lanyunyu-web';
 const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'master';
@@ -97,11 +94,16 @@ async function readJSON(file, fallback) {
   } catch (e) {
     console.error('GitHub read failed for', file, e.message);
   }
-  // 本地兜底：Vercel 打包时 api/ 下的 json 会随函数一起发布
+  // 本地兜底：Vercel 打包时通过 includeFiles 把 api/*.json 带进运行目录
   try {
-    const local = path.join(__dirname, file);
-    if (fs.existsSync(local)) {
-      return JSON.parse(fs.readFileSync(local, 'utf8'));
+    const candidates = [
+      path.join(process.cwd(), 'api', file),
+      path.join(__dirname, file)
+    ];
+    for (const local of candidates) {
+      if (fs.existsSync(local)) {
+        return JSON.parse(fs.readFileSync(local, 'utf8'));
+      }
     }
   } catch (e) {
     console.error('Local read failed for', file, e.message);
