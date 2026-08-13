@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台 · 蓝云屿</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=7" />
+  <link rel="stylesheet" href="assets/css/style.css?v=8" />
   <link rel="icon" type="image/png" href="assets/images/logo.png?v=3" />
 </head>
 <body class="admin-body">
@@ -45,9 +45,9 @@
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
         <h2 style="margin:0;">内容管理</h2>
         <div style="display:flex; gap:10px;">
-          <button class="admin-btn" id="resetBtn" style="background:#e2e8f0; color:#334155;">重置为服务器值</button>
+          <button class="admin-btn secondary" id="resetBtn">重置为服务器值</button>
           <button class="admin-btn primary" id="saveBtn">💾 保存更改</button>
-          <button class="admin-btn" id="logoutBtn" style="background:#f1f5f9; color:#334155;">退出</button>
+          <button class="admin-btn secondary" id="logoutBtn">退出</button>
         </div>
       </div>
       <p class="hint" style="color:#64748b; margin-top:-10px; margin-bottom:20px;">修改后点击「保存更改」会直接写入服务器 data.json，前台立即生效。</p>
@@ -125,7 +125,7 @@
         <h3>📨 联系留言</h3>
         <p class="hint" style="color:#64748b;">前台「联系我们」表单提交的内容会显示在这里。</p>
         <div id="contactsList"><p class="hint" style="color:#94a3b8;">加载中…</p></div>
-        <button class="admin-btn" id="refreshMsg" style="background:#e2e8f0; color:#334155; margin-top:8px;">刷新留言</button>
+        <button class="admin-btn secondary" id="refreshMsg" style="margin-top:8px;">刷新留言</button>
       </section>
 
       <section class="admin-card" id="sec-settings">
