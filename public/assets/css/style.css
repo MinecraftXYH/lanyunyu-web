@@ -332,7 +332,7 @@ footer {
 .admin-frame { display: flex; min-height: calc(100vh - 80px); padding-top: 84px; }
 .admin-sidebar {
   width: 230px; flex: none; padding: 24px 14px;
-  position: sticky; top: 84px; height: calc(100vh - 84px); overflow-y: auto;
+  position: sticky; top: 84px; align-self: flex-start;
 }
 .admin-sidebar a {
   display: flex; align-items: center; gap: 10px;
