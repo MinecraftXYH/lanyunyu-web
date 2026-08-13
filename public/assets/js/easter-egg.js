@@ -12,7 +12,7 @@
     '#ff66cc', '#00f2ff', '#b388ff', '#76ff03'
   ];
 
-  let container = null, running = false;
+  let container = null, running = false, fireTimer = null;
 
   function ensureContainer() {
     if (container) return;
@@ -29,6 +29,15 @@
 
   function removeContainer() {
     if (container) { container.remove(); container = null; }
+  }
+
+  function stopFireworks() {
+    if (fireTimer) { clearInterval(fireTimer); fireTimer = null; }
+    // 等最后一批粒子自然消散后再移除容器
+    setTimeout(function () {
+      removeContainer();
+      running = false;
+    }, 1600);
   }
 
   function makeParticle(x, y, color) {
@@ -118,11 +127,10 @@
       setTimeout(launchRocket, i * 350);
     }
 
-    // 约 4.5 秒后清理并显示文字
+    // 约 4.5 秒后浮出「谢谢你们！」，并让烟花继续在背景燃放
+    setTimeout(showThanks, 4500);
     setTimeout(function () {
-      running = false;
-      removeContainer();
-      showThanks();
+      fireTimer = setInterval(launchRocket, 420);
     }, 4500);
   }
 
@@ -171,7 +179,7 @@
       el.style.transition = 'opacity .8s ease, transform .8s ease';
       el.style.opacity = '0';
       el.style.transform = 'translate(-50%,-50%) scale(1.12)';
-      setTimeout(function () { el.remove(); }, 850);
+      setTimeout(function () { el.remove(); stopFireworks(); }, 850);
     }, total + 2200);
   }
 
