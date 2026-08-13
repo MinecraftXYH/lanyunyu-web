@@ -145,7 +145,72 @@ function renderRepeat(key, containerId) {
       <div class="admin-row">
         ${REPEAT_SCHEMA[key].map(f => field([key, i, f.k], f.label, it && it[f.k], f.k === 'desc' || f.k === 'content' || f.k === 'note')).join('')}
       </div>
+      ${key === 'screenshots' ? screenshotUploadRow(i, it) : ''}
     </div>`).join('');
+}
+
+// 截图卡片里的「上传图片」区域
+function screenshotUploadRow(i, it) {
+  const src = (it && it.src) ? it.src : '';
+  return `
+    <div class="upload-row" style="margin-top:12px; padding-top:12px; border-top:1px dashed #cbd5e1;">
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <label class="admin-btn" style="background:#e2e8f0; color:#334155; cursor:pointer;">
+          📁 选择图片
+          <input type="file" accept="image/*" data-upload="screenshots" data-idx="${i}" style="display:none;" />
+        </label>
+        ${src ? `<img class="upload-preview" src="/${escAttr(src)}" alt="预览" style="max-width:160px; max-height:100px; border-radius:8px; border:1px solid #e2e8f0;" />` : '<span class="hint" style="color:#94a3b8;">未上传</span>'}
+      </div>
+      <p class="hint" style="color:#64748b; margin:8px 0 0;">选图后会自动压缩并上传，图片地址自动填入上面的「图片地址」，最后记得点「保存更改」。</p>
+    </div>`;
+}
+
+// 客户端压缩：限制最大宽度，转 JPEG，避免超过 GitHub 1MB 单文件限制
+function resizeImageFile(file, maxW = 1280, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('读取文件失败'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('图片解析失败'));
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxW) { height = Math.round(height * maxW / width); width = maxW; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleUpload(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const key = input.dataset.upload;
+  const i = Number(input.dataset.idx);
+  try {
+    toast('图片处理中…');
+    const dataUrl = await resizeImageFile(file);
+    toast('上传中…');
+    const res = await fetch('/api/upload', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ name: file.name, dataUrl }) });
+    const j = await res.json();
+    if (j.ok) {
+      setByPath(EDIT, [key, i, 'src'], j.url);
+      renderRepeat(key, key + 'List'); // 重新渲染以显示预览并回填 src 输入框
+      toast('✅ 已上传，记得点「保存更改」');
+    } else {
+      toast('❌ 上传失败：' + (j.msg || ''));
+    }
+  } catch (e) {
+    toast('❌ 上传失败：' + e.message);
+    console.error('[admin] upload error', e);
+  } finally {
+    input.value = '';
+  }
 }
 
 function renderAllForms() {
@@ -189,6 +254,13 @@ function bindGlobal() {
     if (inp.dataset.bind) {
       const p = inp.dataset.bind.split('|');
       setByPath(EDIT, p, inp.value);
+    }
+  });
+
+  document.addEventListener('change', e => {
+    const inp = e.target;
+    if (inp.dataset && inp.dataset.upload) {
+      handleUpload(inp);
     }
   });
 

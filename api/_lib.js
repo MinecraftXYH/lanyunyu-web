@@ -133,6 +133,7 @@ function readBody(req) {
 
 module.exports = {
   TOKEN, ADMIN_USER, ADMIN_PWD,
+  GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN,
   isAdmin, ok, fail, readJSON, writeJSON, readBody,
   cors
 };
