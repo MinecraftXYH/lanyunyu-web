@@ -44,10 +44,6 @@ const REPEAT_SCHEMA = {
     { k: 'title', label: '标题' },
     { k: 'desc', label: '描述' }
   ],
-  screenshots: [
-    { k: 'src', label: '图片地址（src）' },
-    { k: 'caption', label: '说明文字' }
-  ],
   downloads: [
     { k: 'name', label: '名称' },
     { k: 'version', label: '版本' },
@@ -121,6 +117,11 @@ function restoreCsv(obj) {
     if (obj.contact.guideCsv != null) obj.contact.guide = obj.contact.guideCsv.split('\n').map(s => s.trim()).filter(Boolean);
   }
 }
+function ensureObject(v, label) {
+  if (v && typeof v === 'object' && !Array.isArray(v)) return v;
+  console.warn(`[admin] 字段 ${label} 不是对象，已重置`, v);
+  return {};
+}
 
 function renderTop(key, containerId) {
   const c = document.getElementById(containerId);
@@ -145,8 +146,41 @@ function renderRepeat(key, containerId) {
       <div class="admin-row">
         ${REPEAT_SCHEMA[key].map(f => field([key, i, f.k], f.label, it && it[f.k], f.k === 'desc' || f.k === 'content' || f.k === 'note')).join('')}
       </div>
-      ${key === 'screenshots' ? screenshotUploadRow(i, it) : ''}
     </div>`).join('');
+}
+
+// 游戏截图是对象 {title, subtitle, items}，单独渲染
+function renderScreenshots() {
+  const c = document.getElementById('screenshotsList');
+  if (!c) return;
+  let sh = ensureObject(EDIT.screenshots, 'screenshots');
+  EDIT.screenshots = sh;
+  if (!sh.title) sh.title = '游戏截图';
+  if (!sh.subtitle) sh.subtitle = '玩家在蓝云屿留下的精彩瞬间';
+  let items = sh.items;
+  if (!Array.isArray(items)) {
+    console.warn('[admin] screenshots.items 不是数组，已重置', items);
+    items = sh.items = [];
+  }
+  c.innerHTML = `
+    <div class="repeat-card">
+      <div class="admin-row">
+        ${field(['screenshots', 'title'], '板块标题', sh.title)}
+        ${field(['screenshots', 'subtitle'], '板块副标题', sh.subtitle)}
+      </div>
+    </div>
+    ${items.map((it, i) => `
+      <div class="repeat-card" data-idx="${i}">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong>#${i + 1}</strong>
+          <button class="admin-btn danger" data-del="screenshots" data-i="${i}">删除</button>
+        </div>
+        <div class="admin-row">
+          ${field(['screenshots', 'items', i, 'src'], '图片地址（src）', it && it.src)}
+          ${field(['screenshots', 'items', i, 'caption'], '说明文字', it && it.caption)}
+        </div>
+        ${screenshotUploadRow(i, it)}
+      </div>`).join('')}`;
 }
 
 // 截图卡片里的「上传图片」区域
@@ -159,7 +193,7 @@ function screenshotUploadRow(i, it) {
           📁 选择图片
           <input type="file" accept="image/*" data-upload="screenshots" data-idx="${i}" style="display:none;" />
         </label>
-        ${src ? `<img class="upload-preview" src="/${escAttr(src)}" alt="预览" style="max-width:160px; max-height:100px; border-radius:8px; border:1px solid #e2e8f0;" />` : '<span class="hint" style="color:#94a3b8;">未上传</span>'}
+        ${src ? `<img class="upload-preview" src="${escAttr(/^https?:\/\//i.test(src) ? src : '/' + src)}" alt="预览" style="max-width:160px; max-height:100px; border-radius:8px; border:1px solid #e2e8f0;" />` : '<span class="hint" style="color:#94a3b8;">未上传</span>'}
       </div>
       <p class="hint" style="color:#64748b; margin:8px 0 0;">选图后会自动压缩并上传，图片地址自动填入上面的「图片地址」，最后记得点「保存更改」。</p>
     </div>`;
@@ -199,8 +233,10 @@ async function handleUpload(input) {
     const res = await fetch('/api/upload', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ name: file.name, dataUrl }) });
     const j = await res.json();
     if (j.ok) {
-      setByPath(EDIT, [key, i, 'src'], j.url);
-      renderRepeat(key, key + 'List'); // 重新渲染以显示预览并回填 src 输入框
+      const path = key === 'screenshots' ? [key, 'items', i, 'src'] : [key, i, 'src'];
+      setByPath(EDIT, path, j.url);
+      if (key === 'screenshots') renderScreenshots();
+      else renderRepeat(key, key + 'List');
       toast('✅ 已上传，记得点「保存更改」');
     } else {
       toast('❌ 上传失败：' + (j.msg || ''));
@@ -224,6 +260,7 @@ function renderAllForms() {
   safeRender(renderTop, 'community', 'communityFields');
   safeRender(renderTop, 'contact', 'contactFields');
   for (const k in REPEAT_SCHEMA) safeRender(renderRepeat, k, k + 'List');
+  safeRender(renderScreenshots);
   populateBinds();
 }
 
@@ -264,18 +301,32 @@ function bindGlobal() {
     }
   });
 
-  document.addEventListener('click', e => {
-    if (e.target.dataset.del) {
-      const k = e.target.dataset.del, i = Number(e.target.dataset.i);
-      EDIT[k].splice(i, 1); renderRepeat(k, k + 'List');
+document.addEventListener('click', e => {
+  if (e.target.dataset.del) {
+    const k = e.target.dataset.del, i = Number(e.target.dataset.i);
+    if (k === 'screenshots') {
+      if (EDIT.screenshots && Array.isArray(EDIT.screenshots.items)) EDIT.screenshots.items.splice(i, 1);
+      renderScreenshots();
+    } else {
+      if (Array.isArray(EDIT[k])) EDIT[k].splice(i, 1);
+      renderRepeat(k, k + 'List');
     }
-    if (e.target.dataset.add) {
-      const k = e.target.dataset.add;
+  }
+  if (e.target.dataset.add) {
+    const k = e.target.dataset.add;
+    if (k === 'screenshots') {
+      if (!EDIT.screenshots || typeof EDIT.screenshots !== 'object' || Array.isArray(EDIT.screenshots)) EDIT.screenshots = {};
+      if (!Array.isArray(EDIT.screenshots.items)) EDIT.screenshots.items = [];
+      EDIT.screenshots.items.push({ src: '', caption: '' });
+      renderScreenshots();
+    } else {
       const blank = {};
       REPEAT_SCHEMA[k].forEach(f => blank[f.k] = '');
-      EDIT[k].push(blank); renderRepeat(k, k + 'List');
+      if (Array.isArray(EDIT[k])) EDIT[k].push(blank);
+      renderRepeat(k, k + 'List');
     }
-  });
+  }
+});
 
   // 侧边栏高亮
   document.querySelectorAll('.admin-sidebar a').forEach(a => {

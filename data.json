@@ -74,12 +74,16 @@
     "qqDesc": "与其他玩家实时交流，获取最新公告与帮助",
     "qqBtn": "点击加入群聊"
   },
-  "screenshots": [
-    {
-      "src": "assets/images/1786586146765-022b1b-3F9FF26B1E3B4F70F8889590.jpg",
-      "caption": ""
-    }
-  ],
+  "screenshots": {
+    "title": "游戏截图",
+    "subtitle": "玩家在蓝云屿留下的精彩瞬间",
+    "items": [
+      {
+        "src": "assets/images/1786586146765-022b1b-3F9FF26B1E3B4F70F8889590.jpg",
+        "caption": ""
+      }
+    ]
+  },
   "contact": {
     "title": "联系我们",
     "subtitle": "有任何问题或建议？通过邮件直接联系服主",
