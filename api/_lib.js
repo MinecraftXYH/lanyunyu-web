@@ -131,9 +131,39 @@ function readBody(req) {
   });
 }
 
+// ---------- 用户（前台玩家账号）密码哈希 ----------
+function hashPassword(pwd, salt) {
+  salt = salt || crypto.randomBytes(16).toString('hex');
+  const hash = crypto.createHash('sha256').update(salt + ':' + pwd).digest('hex');
+  return salt + '$' + hash;
+}
+function verifyPassword(pwd, stored) {
+  if (!stored || stored.indexOf('$') < 0) return false;
+  const [salt, hash] = stored.split('$');
+  const calc = crypto.createHash('sha256').update(salt + ':' + pwd).digest('hex');
+  // 常量时间比较，避免计时攻击
+  const a = Buffer.from(calc);
+  const b = Buffer.from(hash);
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
+
+// ---------- 用户存储 ----------
+async function readUsers() {
+  const fallback = { users: [] };
+  const data = await readJSON('users.json', fallback);
+  if (!data || !Array.isArray(data.users)) data.users = [];
+  return data;
+}
+async function writeUsers(obj, message) {
+  return writeJSON('users.json', obj, message || 'update users');
+}
+
 module.exports = {
   TOKEN, ADMIN_USER, ADMIN_PWD,
   GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN,
   isAdmin, ok, fail, readJSON, writeJSON, readBody,
-  cors
+  cors, hashPassword, verifyPassword, readUsers, writeUsers
 };

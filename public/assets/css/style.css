@@ -391,12 +391,66 @@ footer {
 }
 .login-box h2 { margin-top: 0; color: #fff; }
 
+/* ---------- 前台账号（登录/注册/个人中心） ---------- */
+.auth-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.auth-tab {
+  flex: 1; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.12); background: transparent; color: #94a3b8;
+}
+.auth-tab.active { background: rgba(255,255,255,0.10); color: #fff; border-color: rgba(255,255,255,0.20); }
+.auth-form .admin-btn.primary { margin-top: 4px; }
+.auth-err { color: #fca5a5; font-size: .85rem; margin-top: 10px; min-height: 1em; }
+
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   background: #10b981; color: #fff; padding: 12px 22px; border-radius: 10px;
   font-weight: 700; opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 100;
 }
 .toast.show { opacity: 1; }
+
+/* ---------- Account / 玩家中心 ---------- */
+.glass-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 28px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+.tab-row .tab-btn {
+  flex: 1; padding: 10px; border: 1px solid var(--glass-border);
+  background: transparent; color: var(--muted); font-weight: 700;
+  border-radius: 12px; cursor: pointer; font-size: .95rem;
+}
+.tab-row .tab-btn.active {
+  background: var(--accent); color: #06281a; border-color: var(--accent);
+}
+.field { margin-bottom: 16px; }
+.field label { display: block; color: var(--muted); font-size: .85rem; margin-bottom: 6px; }
+.field input {
+  width: 100%; padding: 11px 14px; border-radius: 12px;
+  border: 1px solid var(--glass-border); background: rgba(0,0,0,0.25);
+  color: var(--text); font: inherit;
+}
+.field input::placeholder { color: #5d6b85; }
+.field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.err { color: var(--danger); font-size: .85rem; min-height: 18px; margin: 4px 0 12px; }
+.ok-msg { color: var(--accent); font-size: .85rem; min-height: 18px; margin: -6px 0 12px; }
+.avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; font-weight: 900; color: #06281a;
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+  flex: none;
+}
+.nav-logout {
+  background: var(--glass-strong); color: var(--muted);
+  border: 1px solid var(--glass-border); border-radius: 10px;
+  padding: 6px 12px; font: inherit; font-size: .85rem; cursor: pointer;
+}
+.nav-logout:hover { color: var(--text); }
+
 
 @media (max-width: 860px) {
   .nav-links {

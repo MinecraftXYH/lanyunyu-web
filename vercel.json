@@ -26,6 +26,12 @@
     },
     "api/me.js": {
       "includeFiles": "api/users.json"
+    },
+    "api/change-pwd.js": {
+      "includeFiles": "api/users.json"
+    },
+    "api/logout.js": {
+      "includeFiles": "api/users.json"
     }
   }
 }

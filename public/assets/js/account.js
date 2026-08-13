@@ -1,120 +1,139 @@
-// 蓝云屿 · 玩家中心 前端逻辑
+// 前台玩家账号：登录 / 注册 / 改密码 / 登出 / 同步导航
 const AUTH_KEY = 'lyy_user_token';
+let token = localStorage.getItem(AUTH_KEY) || '';
+let me = null;
 
-function getToken() { return localStorage.getItem(AUTH_KEY) || ''; }
-function setToken(t) { localStorage.setItem(AUTH_KEY, t); }
-function clearToken() { localStorage.removeItem(AUTH_KEY); }
+function setErr(id, msg) { document.getElementById(id).textContent = msg || ''; }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1800);
-}
-
-async function api(method, path, body) {
-  const headers = { 'Content-Type': 'application/json' };
-  const token = getToken();
-  if (token) headers.Authorization = 'Bearer ' + token;
-  const res = await fetch(path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+async function api(path, opts) {
+  const res = await fetch(path, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
   let j = {};
-  try { j = await res.json(); } catch {}
+  try { j = await res.json(); } catch (e) {}
   return { ok: res.ok, status: res.status, data: j };
 }
 
-function switchTab(tab) {
-  const isLogin = tab === 'login';
-  document.getElementById('loginForm').style.display = isLogin ? '' : 'none';
-  document.getElementById('regForm').style.display = isLogin ? 'none' : '';
-  document.getElementById('tabLogin').classList.toggle('active', isLogin);
-  document.getElementById('tabReg').classList.toggle('active', !isLogin);
+async function refreshMe() {
+  if (!token) { me = null; return; }
+  const r = await api('/api/me', { headers: { 'Authorization': 'Bearer ' + token } });
+  if (r.ok) { me = r.data; }
+  else { token = ''; localStorage.removeItem(AUTH_KEY); me = null; }
+}
+
+// 同步导航栏入口（与 nav-user.js 共用）
+function syncNav() {
+  if (window.__updateNavState) window.__updateNavState(me && me.username ? me.username : null);
+}
+
+function showProfile() {
+  document.getElementById('authWrap').style.display = 'none';
+  document.getElementById('profileWrap').style.display = 'block';
+  document.getElementById('profName').textContent = me.username;
+  document.getElementById('profQq').textContent = me.qq ? ('已绑定 QQ：' + me.qq) : '未绑定 QQ（注册时可填）';
+  document.getElementById('accTitle').textContent = '个人中心';
 }
 
 function showAuth() {
-  document.getElementById('authPanel').style.display = '';
-  document.getElementById('userPanel').style.display = 'none';
-  if (window.__updateNavState) window.__updateNavState(null);
+  document.getElementById('authWrap').style.display = 'block';
+  document.getElementById('profileWrap').style.display = 'none';
+  document.getElementById('accTitle').textContent = '登录 / 注册';
 }
 
-function showUser(user) {
-  document.getElementById('authPanel').style.display = 'none';
-  document.getElementById('userPanel').style.display = '';
-  document.getElementById('userName').textContent = user.username;
-  document.getElementById('userAvatar').textContent = (user.username || '玩').charAt(0);
-  document.getElementById('profileQq').value = user.qq || '';
-  const created = user.createdAt ? new Date(user.createdAt).toLocaleDateString('zh-CN') : '';
-  document.getElementById('userCreated').textContent = created ? '加入于 ' + created : '';
-  if (window.__updateNavState) window.__updateNavState(user.username);
-}
+// 标签切换
+document.querySelectorAll('.auth-tab').forEach(function (t) {
+  t.addEventListener('click', function () {
+    document.querySelectorAll('.auth-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const tab = t.getAttribute('data-tab');
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('regForm').style.display = tab === 'register' ? 'block' : 'none';
+    setErr('loginErr', ''); setErr('regErr', '');
+  });
+});
 
-async function loadMe() {
-  const token = getToken();
-  if (!token) { showAuth(); return; }
-  const r = await api('GET', '/api/me');
-  if (r.ok) showUser(r.data);
-  else { clearToken(); showAuth(); }
-}
-
-// ---------- 事件绑定 ----------
-document.getElementById('tabLogin').addEventListener('click', () => switchTab('login'));
-document.getElementById('tabReg').addEventListener('click', () => switchTab('reg'));
-
-document.getElementById('loginBtn').addEventListener('click', async () => {
-  const err = document.getElementById('loginErr');
-  err.textContent = '';
-  const r = await api('POST', '/api/auth', {
-    username: document.getElementById('loginUser').value,
-    password: document.getElementById('loginPwd').value
+// 登录
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  setErr('loginErr', '');
+  const r = await api('/api/auth', {
+    method: 'POST',
+    body: JSON.stringify({ username: document.getElementById('loginUser').value.trim(), pwd: document.getElementById('loginPwd').value })
   });
   if (r.ok) {
-    setToken(r.data.token);
-    showToast('登录成功');
-    loadMe();
+    token = r.data.token;
+    localStorage.setItem(AUTH_KEY, token);
+    me = { username: r.data.username, qq: r.data.qq };
+    syncNav(); showProfile();
   } else {
-    err.textContent = r.data.msg || '登录失败';
+    setErr('loginErr', r.data.msg || '登录失败');
   }
 });
 
-document.getElementById('regBtn').addEventListener('click', async () => {
-  const err = document.getElementById('regErr');
-  err.textContent = '';
-  const r = await api('POST', '/api/register', {
-    username: document.getElementById('regUser').value,
-    password: document.getElementById('regPwd').value,
-    qq: document.getElementById('regQq').value
+// 注册
+document.getElementById('regForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  setErr('regErr', '');
+  const r = await api('/api/register', {
+    method: 'POST',
+    body: JSON.stringify({
+      username: document.getElementById('regUser').value.trim(),
+      pwd: document.getElementById('regPwd').value,
+      qq: document.getElementById('regQq').value.trim()
+    })
   });
   if (r.ok) {
-    // 注册成功后自动登录
-    const loginR = await api('POST', '/api/auth', {
-      username: document.getElementById('regUser').value,
-      password: document.getElementById('regPwd').value
+    // 注册成功自动登录
+    const lr = await api('/api/auth', {
+      method: 'POST',
+      body: JSON.stringify({ username: document.getElementById('regUser').value.trim(), pwd: document.getElementById('regPwd').value })
     });
-    if (loginR.ok) { setToken(loginR.data.token); showToast('注册成功'); loadMe(); }
-    else { switchTab('login'); err.textContent = '注册成功，请手动登录'; }
+    if (lr.ok) {
+      token = lr.data.token;
+      localStorage.setItem(AUTH_KEY, token);
+      me = { username: lr.data.username, qq: lr.data.qq };
+      syncNav(); showProfile();
+    } else {
+      // 注册成功但自动登录失败，切到登录页
+      document.querySelector('.auth-tab[data-tab="login"]').click();
+      setErr('loginErr', '注册成功，请登录');
+    }
   } else {
-    err.textContent = r.data.msg || '注册失败';
+    setErr('regErr', r.data.msg || '注册失败');
   }
 });
 
-document.getElementById('profileBtn').addEventListener('click', async () => {
-  const err = document.getElementById('profileErr');
-  const okMsg = document.getElementById('profileOk');
-  err.textContent = ''; okMsg.textContent = '';
-  const newPwd = document.getElementById('profileNew').value;
-  const oldPwd = document.getElementById('profileOld').value;
-  if (newPwd && !oldPwd) { err.textContent = '修改密码需先填写原密码'; return; }
-  const r = await api('PUT', '/api/me', {
-    password: oldPwd,
-    newPassword: newPwd,
-    qq: document.getElementById('profileQq').value
+// 改密码
+document.getElementById('pwdForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  setErr('pwdMsg', '');
+  const r = await api('/api/change-pwd', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ oldPwd: document.getElementById('oldPwd').value, newPwd: document.getElementById('newPwd').value })
   });
-  if (r.ok) { okMsg.textContent = '已保存 ✓'; showToast('资料已更新'); }
-  else { err.textContent = r.data.msg || '保存失败'; }
+  if (r.ok) {
+    setErr('pwdMsg', '✅ 密码已更新，请重新登录');
+    document.getElementById('oldPwd').value = '';
+    document.getElementById('newPwd').value = '';
+    setTimeout(async function () {
+      await api('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+      token = ''; localStorage.removeItem(AUTH_KEY); me = null;
+      syncNav(); showAuth();
+    }, 1200);
+  } else {
+    setErr('pwdMsg', r.data.msg || '修改失败');
+  }
 });
 
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  clearToken(); showAuth(); showToast('已退出');
+// 登出
+document.getElementById('logoutBtn').addEventListener('click', async function () {
+  await api('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+  token = ''; localStorage.removeItem(AUTH_KEY); me = null;
+  syncNav(); showAuth();
 });
 
-loadMe();
+// 初始化
+(async function () {
+  await refreshMe();
+  syncNav();
+  if (me && me.username) showProfile(); else showAuth();
+})();
