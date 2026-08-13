@@ -7,120 +7,123 @@
   if (window.__lyyEgg) return;
   window.__lyyEgg = true;
 
-  // ---------------- 烟花 ----------------
-  let canvas, ctx, particles = [], rockets = [], animId = null, running = false;
+  const COLORS = [
+    '#ff4d4d', '#4dff88', '#4da6ff', '#ffeb3b',
+    '#ff66cc', '#00f2ff', '#b388ff', '#76ff03'
+  ];
 
-  function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.floor(window.innerWidth * dpr);
-    canvas.height = Math.floor(window.innerHeight * dpr);
-    canvas.style.width = '100vw';
-    canvas.style.height = '100vh';
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(dpr, dpr);
-  }
-  function ensureCanvas() {
-    if (canvas) return;
-    canvas = document.createElement('canvas');
-    canvas.id = 'egg-canvas';
-    Object.assign(canvas.style, {
-      position: 'fixed', inset: '0', width: '100vw', height: '100vh',
-      zIndex: '100001', pointerEvents: 'none'
+  let container = null, running = false;
+
+  function ensureContainer() {
+    if (container) return;
+    container = document.createElement('div');
+    container.id = 'egg-fireworks';
+    Object.assign(container.style, {
+      position: 'fixed', inset: '0',
+      width: '100vw', height: '100vh',
+      zIndex: '100001', pointerEvents: 'none',
+      overflow: 'hidden'
     });
-    document.documentElement.appendChild(canvas); // 挂在 html 上，避免被 body 子 stacking 影响
-    ctx = canvas.getContext('2d');
-    resize();
-    window.addEventListener('resize', resize);
+    document.body.appendChild(container);
   }
+
+  function removeContainer() {
+    if (container) { container.remove(); container = null; }
+  }
+
+  function makeParticle(x, y, color) {
+    const p = document.createElement('div');
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 3 + Math.random() * 6;
+    const size = 4 + Math.random() * 5;
+    Object.assign(p.style, {
+      position: 'absolute',
+      left: x + 'px', top: y + 'px',
+      width: size + 'px', height: size + 'px',
+      borderRadius: '50%',
+      backgroundColor: color,
+      boxShadow: '0 0 8px ' + color + ', 0 0 16px ' + color,
+      opacity: '1',
+      transform: 'translate(-50%, -50%)',
+      transition: 'opacity .05s linear'
+    });
+    container.appendChild(p);
+
+    let vx = Math.cos(angle) * speed;
+    let vy = Math.sin(angle) * speed;
+    let life = 1;
+    let px = x, py = y;
+
+    function step() {
+      if (!container) { p.remove(); return; }
+      px += vx; py += vy;
+      vy += 0.18; // 重力
+      vx *= 0.98; // 空气阻力
+      life -= 0.014;
+      if (life <= 0) { p.remove(); return; }
+      p.style.left = px + 'px';
+      p.style.top = py + 'px';
+      p.style.opacity = life;
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
   function launchRocket() {
-    rockets.push({
-      x: 60 + Math.random() * (canvas.width / (window.devicePixelRatio || 1) - 120),
-      y: canvas.height / (window.devicePixelRatio || 1),
-      vy: -(7 + Math.random() * 5),
-      targetY: (canvas.height / (window.devicePixelRatio || 1)) * (0.14 + Math.random() * 0.32),
-      color: 'hsl(' + Math.floor(Math.random() * 360) + ',95%,68%)'
-    });
-  }
-  function explode(x, y, color) {
-    const n = 50 + Math.floor(Math.random() * 40);
-    for (let i = 0; i < n; i++) {
-      const a = (Math.PI * 2 * i) / n + (Math.random() - 0.5) * 0.3;
-      const sp = 2.5 + Math.random() * 6;
-      particles.push({
-        x: x, y: y,
-        vx: Math.cos(a) * sp,
-        vy: Math.sin(a) * sp,
-        life: 1,
-        decay: 0.008 + Math.random() * 0.014,
-        color: color,
-        size: 1.5 + Math.random() * 3.5
-      });
-    }
-  }
-  function loop() {
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = 'rgba(0,0,0,0.12)';
-    ctx.fillRect(0, 0,
-      canvas.width / (window.devicePixelRatio || 1),
-      canvas.height / (window.devicePixelRatio || 1));
-    ctx.globalCompositeOperation = 'lighter';
+    if (!container) return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const startX = 80 + Math.random() * (w - 160);
+    const targetY = h * (0.15 + Math.random() * 0.35);
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
 
-    rockets.forEach(function (r, i) {
-      r.y += r.vy;
-      // 火箭尾迹
-      ctx.beginPath();
-      ctx.strokeStyle = r.color;
-      ctx.lineWidth = 2;
-      ctx.moveTo(r.x, r.y);
-      ctx.lineTo(r.x, r.y - r.vy * 3);
-      ctx.stroke();
-      // 火箭头（加大 + 发光）
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = r.color;
-      ctx.beginPath();
-      ctx.fillStyle = '#fff';
-      ctx.arc(r.x, r.y, 4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      if (r.y <= r.targetY) {
-        explode(r.x, r.y, r.color);
-        rockets.splice(i, 1);
+    const rocket = document.createElement('div');
+    Object.assign(rocket.style, {
+      position: 'absolute',
+      left: startX + 'px', top: h + 'px',
+      width: '6px', height: '16px',
+      borderRadius: '3px',
+      backgroundColor: '#fff',
+      boxShadow: '0 0 8px ' + color,
+      transform: 'translate(-50%, -50%)'
+    });
+    container.appendChild(rocket);
+
+    let y = h;
+    const speed = 9 + Math.random() * 6;
+    function rise() {
+      if (!container) { rocket.remove(); return; }
+      y -= speed;
+      rocket.style.top = y + 'px';
+      if (y <= targetY) {
+        rocket.remove();
+        // 爆炸：生成一堆粒子
+        const n = 45 + Math.floor(Math.random() * 30);
+        for (let i = 0; i < n; i++) makeParticle(startX, y, color);
+      } else {
+        requestAnimationFrame(rise);
       }
-    });
-    particles.forEach(function (p, i) {
-      p.x += p.vx; p.y += p.vy;
-      p.vy += 0.08;
-      p.life -= p.decay;
-      if (p.life <= 0) { particles.splice(i, 1); return; }
-      ctx.globalAlpha = Math.max(p.life, 0);
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = p.color;
-      ctx.beginPath();
-      ctx.fillStyle = p.color;
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.globalAlpha = 1;
-    });
-    if (rockets.length || particles.length) {
-      animId = requestAnimationFrame(loop);
-    } else {
-      running = false;
-      if (animId) cancelAnimationFrame(animId);
-      if (canvas) { canvas.remove(); canvas = null; ctx = null; }
-      showThanks();
     }
+    requestAnimationFrame(rise);
   }
+
   function celebrate() {
     console.log('[蓝云屿彩蛋] 烟花触发！');
-    ensureCanvas();
+    ensureContainer();
     if (running) return;
     running = true;
-    const bursts = 9;
+
+    const bursts = 10;
     for (let i = 0; i < bursts; i++) {
-      setTimeout(launchRocket, i * 360);
+      setTimeout(launchRocket, i * 350);
     }
-    if (!animId) loop();
+
+    // 约 4.5 秒后清理并显示文字
+    setTimeout(function () {
+      running = false;
+      removeContainer();
+      showThanks();
+    }, 4500);
   }
 
   // ---------------- 谢谢你们！ ----------------
@@ -136,7 +139,7 @@
       fontWeight: '900',
       color: '#fff',
       textShadow: '0 0 30px rgba(59,220,136,.9), 0 0 60px rgba(74,168,255,.7)',
-      zIndex: '9999', pointerEvents: 'none',
+      zIndex: '100002', pointerEvents: 'none',
       opacity: '0',
       transition: 'opacity .6s ease, transform .6s cubic-bezier(.2,1.4,.4,1)'
     });
