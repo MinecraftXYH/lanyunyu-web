@@ -267,7 +267,7 @@ function bindContact() {
     }
     btn.textContent = '发送中…'; btn.disabled = true;
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('/api/site?action=contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, subject, content })

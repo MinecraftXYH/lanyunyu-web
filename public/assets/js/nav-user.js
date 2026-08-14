@@ -38,7 +38,7 @@
     const token = getToken();
     if (!token) { if (window.__updateNavState) window.__updateNavState(null); return; }
     try {
-      const r = await fetch('/api/me', { headers: { Authorization: 'Bearer ' + token } });
+      const r = await fetch('/api/users?action=me', { headers: { Authorization: 'Bearer ' + token } });
       const j = await r.json();
       if (r.ok && j.username) { if (window.__updateNavState) window.__updateNavState(j.username); }
       else { clearToken(); if (window.__updateNavState) window.__updateNavState(null); }

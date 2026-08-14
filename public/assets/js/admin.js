@@ -356,7 +356,7 @@ async function doLogin() {
 
 async function checkHealth() {
   try {
-    const res = await fetch('/api/health', { headers: authHeaders() });
+    const res = await fetch('/api/site?action=health', { headers: authHeaders() });
     const h = await res.json();
     if (!h.githubConfigured) {
       toast('⚠️ 未配置 GITHUB_TOKEN，保存功能不可用');
@@ -368,7 +368,7 @@ async function checkHealth() {
 
 async function loadConfig(silent) {
   try {
-    const res = await fetch('/api/config', { headers: authHeaders() });
+    const res = await fetch('/api/site?action=config', { headers: authHeaders() });
     if (!res.ok) {
       const text = await res.text();
       throw new Error('服务器返回 ' + res.status + '：' + text.slice(0, 120));
@@ -391,7 +391,7 @@ async function doSave() {
     toast('提示：修改密码需重启服务并设置环境变量 LYY_ADMIN_PWD');
   }
   try {
-    const res = await fetch('/api/config', { method: 'POST', headers: authHeaders(), body: JSON.stringify(EDIT) });
+    const res = await fetch('/api/site?action=config', { method: 'POST', headers: authHeaders(), body: JSON.stringify(EDIT) });
     const j = await res.json();
     if (j.ok) toast('✅ 已保存到服务器'); else toast(j.msg || '保存失败');
   } catch (e) { toast('保存失败：网络错误'); }
@@ -400,7 +400,7 @@ async function doSave() {
 async function loadContacts() {
   const c = document.getElementById('contactsList');
   try {
-    const res = await fetch('/api/contacts', { headers: authHeaders() });
+    const res = await fetch('/api/site?action=contacts', { headers: authHeaders() });
     if (res.status === 401) { c.innerHTML = '<p class="hint" style="color:#94a3b8;">未登录</p>'; return; }
     const list = await res.json();
     if (!list.length) { c.innerHTML = '<p class="hint" style="color:#94a3b8;">暂无留言</p>'; return; }
@@ -411,7 +411,7 @@ async function loadContacts() {
         <button class="admin-btn danger" data-delmsg="${m.id}" style="margin-top:8px;">删除</button>
       </div>`).join('');
     c.querySelectorAll('[data-delmsg]').forEach(b => b.addEventListener('click', async () => {
-      await fetch('/api/contacts/' + b.dataset.delmsg, { method: 'DELETE', headers: authHeaders() });
+      await fetch('/api/site?action=contacts&id=' + b.dataset.delmsg, { method: 'DELETE', headers: authHeaders() });
       loadContacts();
     }));
   } catch (e) { c.innerHTML = '<p class="hint" style="color:#94a3b8;">加载失败</p>'; }

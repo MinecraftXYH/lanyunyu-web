@@ -17,7 +17,7 @@ function formatTime(ts) {
 
 async function init() {
   if (token) {
-    const r = await api('/api/me', { headers: { 'Authorization': 'Bearer ' + token } });
+    const r = await api('/api/users?action=me', { headers: { 'Authorization': 'Bearer ' + token } });
     if (r.ok) currentUser = r.data;
   }
 
@@ -43,7 +43,7 @@ async function init() {
 }
 
 async function loadPosts() {
-  const r = await api('/api/posts');
+  const r = await api('/api/community?action=posts');
   const list = document.getElementById('forumList');
   if (!r.ok || !r.data.posts) {
     list.innerHTML = '<p style="color:#94a3b8;">加载失败</p>';
@@ -79,7 +79,7 @@ async function submitPost() {
   document.getElementById('postErr').textContent = '';
   if (!title || !content) return document.getElementById('postErr').textContent = '标题和内容不能为空';
 
-  const r = await api('/api/posts', {
+  const r = await api('/api/community?action=posts', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + token },
     body: JSON.stringify({ title, content, category })

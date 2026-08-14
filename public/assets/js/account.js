@@ -14,7 +14,7 @@ async function api(path, opts) {
 
 async function refreshMe() {
   if (!token) { me = null; return; }
-  const r = await api('/api/me', { headers: { 'Authorization': 'Bearer ' + token } });
+  const r = await api('/api/users?action=me', { headers: { 'Authorization': 'Bearer ' + token } });
   if (r.ok) { me = r.data; }
   else { token = ''; localStorage.removeItem(AUTH_KEY); me = null; }
 }
@@ -62,7 +62,7 @@ document.getElementById('toLogin').addEventListener('click', function (e) {
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
   setErr('loginErr', '');
-  const r = await api('/api/auth', {
+  const r = await api('/api/users?action=auth', {
     method: 'POST',
     body: JSON.stringify({ username: document.getElementById('loginUser').value.trim(), pwd: document.getElementById('loginPwd').value })
   });
@@ -81,7 +81,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 document.getElementById('regForm').addEventListener('submit', async function (e) {
   e.preventDefault();
   setErr('regErr', '');
-  const r = await api('/api/register', {
+  const r = await api('/api/users?action=register', {
     method: 'POST',
     body: JSON.stringify({
       username: document.getElementById('regUser').value.trim(),
@@ -91,7 +91,7 @@ document.getElementById('regForm').addEventListener('submit', async function (e)
   });
   if (r.ok) {
     // 注册成功自动登录
-    const lr = await api('/api/auth', {
+    const lr = await api('/api/users?action=auth', {
       method: 'POST',
       body: JSON.stringify({ username: document.getElementById('regUser').value.trim(), pwd: document.getElementById('regPwd').value })
     });
@@ -115,7 +115,7 @@ document.getElementById('regForm').addEventListener('submit', async function (e)
 document.getElementById('pwdForm').addEventListener('submit', async function (e) {
   e.preventDefault();
   setErr('pwdMsg', '');
-  const r = await api('/api/change-pwd', {
+  const r = await api('/api/users?action=change-pwd', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + token },
     body: JSON.stringify({ oldPwd: document.getElementById('oldPwd').value, newPwd: document.getElementById('newPwd').value })
@@ -125,7 +125,7 @@ document.getElementById('pwdForm').addEventListener('submit', async function (e)
     document.getElementById('oldPwd').value = '';
     document.getElementById('newPwd').value = '';
     setTimeout(async function () {
-      await api('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+      await api('/api/users?action=logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
       token = ''; localStorage.removeItem(AUTH_KEY); me = null;
       syncNav(); showAuth();
     }, 1200);
@@ -143,7 +143,7 @@ document.getElementById('profBio').addEventListener('input', function () {
 document.getElementById('saveBioBtn').addEventListener('click', async function () {
   const bio = document.getElementById('profBio').value.trim();
   setErr('bioMsg', '');
-  const r = await api('/api/update-profile', {
+  const r = await api('/api/users?action=update-profile', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + token },
     body: JSON.stringify({ bio })
@@ -176,7 +176,7 @@ document.getElementById('avatarInput').addEventListener('change', async function
     });
     if (!up.ok) { setErr('bioMsg', up.data.msg || '头像上传失败'); return; }
 
-    const r = await api('/api/update-profile', {
+    const r = await api('/api/users?action=update-profile', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ avatar: up.data.url })
@@ -200,7 +200,7 @@ document.getElementById('myProfileBtn').addEventListener('click', function () {
 
 // 登出
 document.getElementById('logoutBtn').addEventListener('click', async function () {
-  await api('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
+  await api('/api/users?action=logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
   token = ''; localStorage.removeItem(AUTH_KEY); me = null;
   syncNav(); showAuth();
 });

@@ -13,59 +13,14 @@
     { "source": "/profile", "destination": "/public/profile.html" }
   ],
   "functions": {
-    "api/config.js": {
-      "includeFiles": "api/data.json"
+    "api/site.js": {
+      "includeFiles": "api/{data,contacts}.json"
     },
-    "api/contact.js": {
-      "includeFiles": "api/data.json"
+    "api/users.js": {
+      "includeFiles": "data/{users,posts,comments,likes}.json"
     },
-    "api/contacts.js": {
-      "includeFiles": "api/contacts.json"
-    },
-    "api/contacts/[id].js": {
-      "includeFiles": "api/contacts.json"
-    },
-    "api/register.js": {
-      "includeFiles": "data/users.json"
-    },
-    "api/auth.js": {
-      "includeFiles": "data/users.json"
-    },
-    "api/me.js": {
-      "includeFiles": "data/users.json"
-    },
-    "api/change-pwd.js": {
-      "includeFiles": "data/users.json"
-    },
-    "api/logout.js": {
-      "includeFiles": "data/users.json"
-    },
-    "api/update-profile.js": {
-      "includeFiles": "data/users.json"
-    },
-    "api/posts.js": {
-      "includeFiles": "data/posts.json"
-    },
-    "api/posts/[id].js": {
-      "includeFiles": "data/posts.json"
-    },
-    "api/comments.js": {
-      "includeFiles": "data/comments.json"
-    },
-    "api/likes.js": {
-      "includeFiles": "data/likes.json"
-    },
-    "api/announcements.js": {
-      "includeFiles": "data/announcements.json"
-    },
-    "api/follow.js": {
-      "includeFiles": "data/users.json"
-    },
-    "api/profile.js": {
-      "includeFiles": "data/users.json"
-    },
-    "api/friend.js": {
-      "includeFiles": "data/users.json"
+    "api/community.js": {
+      "includeFiles": "data/{users,posts,comments,likes,announcements}.json"
     }
   }
 }

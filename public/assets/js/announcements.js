@@ -16,7 +16,7 @@ function escapeHtml(s) {
 }
 
 async function init() {
-  const r = await api('/api/announcements');
+  const r = await api('/api/community?action=announcements');
   const list = document.getElementById('announceList');
   if (!r.ok || !r.data.announcements) {
     list.innerHTML = '<p style="color:#94a3b8;">加载失败</p>';

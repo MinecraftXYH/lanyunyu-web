@@ -26,7 +26,7 @@ async function init() {
   if (!postId) return location.href = 'forum.html';
 
   if (token) {
-    const r = await api('/api/me', { headers: { 'Authorization': 'Bearer ' + token } });
+    const r = await api('/api/users?action=me', { headers: { 'Authorization': 'Bearer ' + token } });
     if (r.ok) currentUser = r.data;
   }
 
@@ -42,7 +42,7 @@ async function init() {
 }
 
 async function loadPost() {
-  const r = await api('/api/posts/' + postId);
+  const r = await api('/api/community?action=posts&id=' + postId);
   const card = document.getElementById('postCard');
   if (!r.ok || !r.data.post) {
     card.innerHTML = '<p style="color:#94a3b8;">帖子不存在或已删除</p>';
@@ -99,7 +99,7 @@ async function submitComment() {
   const content = document.getElementById('commentContent').value.trim();
   document.getElementById('commentErr').textContent = '';
   if (!content) return document.getElementById('commentErr').textContent = '请输入评论内容';
-  const r = await api('/api/comments', {
+  const r = await api('/api/community?action=comments', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + token },
     body: JSON.stringify({ postId, content })
@@ -114,7 +114,7 @@ async function submitComment() {
 
 async function toggleLike(type, targetId) {
   if (!currentUser) return alert('请先登录');
-  const r = await api('/api/likes', {
+  const r = await api('/api/community?action=likes', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + token },
     body: JSON.stringify({ type, targetId })
@@ -124,7 +124,7 @@ async function toggleLike(type, targetId) {
 
 async function deletePost() {
   if (!confirm('确定删除这条帖子？')) return;
-  const r = await api('/api/posts/' + postId, {
+  const r = await api('/api/community?action=posts&id=' + postId, {
     method: 'DELETE',
     headers: { 'Authorization': 'Bearer ' + token }
   });
