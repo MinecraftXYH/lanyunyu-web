@@ -163,9 +163,16 @@ async function writeUsers(obj, message) {
   return writeJSON(USERS_FILE, obj, message || 'update users');
 }
 
+async function verifyUserToken(token) {
+  if (!token) return null;
+  const data = await readUsers();
+  const u = data.users.find(u => u.token === token && u.tokenExp > Date.now());
+  return u || null;
+}
+
 module.exports = {
   TOKEN, ADMIN_USER, ADMIN_PWD,
   GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN,
   isAdmin, ok, fail, readJSON, writeJSON, readBody,
-  cors, hashPassword, verifyPassword, readUsers, writeUsers
+  cors, hashPassword, verifyPassword, readUsers, writeUsers, verifyUserToken
 };

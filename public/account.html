@@ -54,10 +54,26 @@
       </div>
 
       <!-- 已登录：信息 + 改密码 + 登出 -->
-      <div class="admin-card" id="profileWrap" style="max-width:520px;margin:0 auto;display:none;">
-        <h3 style="color:#fff;">👋 <span id="profName"></span></h3>
-        <p class="hint" id="profQq" style="color:#94a3b8;"></p>
-        <hr style="border-color:rgba(255,255,255,.1);margin:18px 0;" />
+      <div class="admin-card" id="profileWrap" style="max-width:560px;margin:0 auto;display:none;">
+        <div class="profile-header">
+          <img class="profile-avatar" id="profAvatar" src="assets/images/default-avatar.jpeg" alt="头像" title="点击更换头像" />
+          <div>
+            <h3 style="color:#fff;margin:0 0 6px;"><span id="profName"></span></h3>
+            <p class="profile-meta" id="profQq"></p>
+            <p class="profile-meta" id="profCreated"></p>
+          </div>
+        </div>
+
+        <div class="admin-field">
+          <label>个人签名</label>
+          <textarea id="profBio" rows="3" maxlength="200" placeholder="写点什么让大家认识你…"></textarea>
+          <p style="color:#64748b;font-size:.75rem;text-align:right;margin-top:4px;"><span id="bioLen">0</span>/200</p>
+        </div>
+        <button type="button" class="admin-btn primary" id="saveBioBtn">保存签名</button>
+        <p class="auth-err" id="bioMsg" style="margin-top:8px;"></p>
+        <input type="file" class="avatar-upload" id="avatarInput" accept="image/jpeg,image/png,image/webp" />
+
+        <hr style="border-color:rgba(255,255,255,.1);margin:24px 0;" />
         <h4 style="color:#fff;margin:0 0 12px;">修改密码</h4>
         <form id="pwdForm">
           <div class="admin-field"><label>原密码</label><input type="password" id="oldPwd" autocomplete="current-password" /></div>

@@ -29,6 +29,13 @@ function showProfile() {
   document.getElementById('profileWrap').style.display = 'block';
   document.getElementById('profName').textContent = me.username;
   document.getElementById('profQq').textContent = me.qq ? ('已绑定 QQ：' + me.qq) : '未绑定 QQ（注册时可填）';
+  document.getElementById('profAvatar').src = me.avatar || 'assets/images/default-avatar.jpeg';
+  document.getElementById('profBio').value = me.bio || '';
+  document.getElementById('bioLen').textContent = (me.bio || '').length;
+  if (me.createdAt) {
+    const d = new Date(me.createdAt);
+    document.getElementById('profCreated').textContent = '加入于 ' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
 }
 
 function showAuth() {
@@ -62,7 +69,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   if (r.ok) {
     token = r.data.token;
     localStorage.setItem(AUTH_KEY, token);
-    me = { username: r.data.username, qq: r.data.qq };
+    me = r.data;
     syncNav();
     location.href = 'index.html';
   } else {
@@ -91,7 +98,7 @@ document.getElementById('regForm').addEventListener('submit', async function (e)
     if (lr.ok) {
       token = lr.data.token;
       localStorage.setItem(AUTH_KEY, token);
-      me = { username: lr.data.username, qq: lr.data.qq };
+      me = lr.data;
       syncNav();
       location.href = 'index.html';
     } else {
@@ -125,6 +132,65 @@ document.getElementById('pwdForm').addEventListener('submit', async function (e)
   } else {
     setErr('pwdMsg', r.data.msg || '修改失败');
   }
+});
+
+// 签名长度提示
+document.getElementById('profBio').addEventListener('input', function () {
+  document.getElementById('bioLen').textContent = this.value.length;
+});
+
+// 保存签名
+document.getElementById('saveBioBtn').addEventListener('click', async function () {
+  const bio = document.getElementById('profBio').value.trim();
+  setErr('bioMsg', '');
+  const r = await api('/api/update-profile', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ bio })
+  });
+  if (r.ok) {
+    me.bio = bio;
+    setErr('bioMsg', '✅ 签名已保存');
+  } else {
+    setErr('bioMsg', r.data.msg || '保存失败');
+  }
+});
+
+// 上传头像
+document.getElementById('profAvatar').addEventListener('click', function () {
+  document.getElementById('avatarInput').click();
+});
+document.getElementById('avatarInput').addEventListener('change', async function () {
+  const file = this.files[0];
+  if (!file) return;
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return setErr('bioMsg', '仅支持 jpg/png/webp');
+  if (file.size > 1024 * 1024) return setErr('bioMsg', '图片超过 1MB，请先压缩');
+
+  const reader = new FileReader();
+  reader.onload = async function () {
+    setErr('bioMsg', '上传中…');
+    const up = await api('/api/upload', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ dataUrl: reader.result, name: file.name })
+    });
+    if (!up.ok) { setErr('bioMsg', up.data.msg || '头像上传失败'); return; }
+
+    const r = await api('/api/update-profile', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ avatar: up.data.url })
+    });
+    if (r.ok) {
+      me.avatar = up.data.url;
+      document.getElementById('profAvatar').src = up.data.url + '?t=' + Date.now();
+      syncNav();
+      setErr('bioMsg', '✅ 头像已更新');
+    } else {
+      setErr('bioMsg', r.data.msg || '头像保存失败');
+    }
+  };
+  reader.readAsDataURL(file);
 });
 
 // 登出

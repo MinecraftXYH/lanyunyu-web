@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { ok, fail, isAdmin, readBody, GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN } = require('./_lib');
+const { ok, fail, isAdmin, readBody, verifyUserToken, GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN } = require('./_lib');
 
 // GitHub Contents API 单文件上限约 1MB（base64 后），这里限制原始图不超过 1MB
 const MAX_BYTES = 1024 * 1024;
@@ -17,9 +17,20 @@ module.exports = async (req, res) => {
     return res.end();
   }
   if (req.method !== 'POST') return fail(res, 405, '不支持的方法');
-  if (!isAdmin(req)) return fail(res, 401, '未登录或密码错误');
 
   const body = await readBody(req);
+  const authHeader = req.headers.authorization || '';
+  const userToken = body.token || (authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '');
+
+  // 校验权限：管理员 或 已登录玩家
+  let uploader = null;
+  if (isAdmin(req)) {
+    uploader = 'admin';
+  } else {
+    const user = await verifyUserToken(userToken);
+    if (!user) return fail(res, 401, '未登录或无权限');
+    uploader = user.username;
+  }
   const dataUrl = body.dataUrl || '';
   const m = dataUrl.match(/^data:(image\/\w+);base64,(.+)$/s);
   if (!m) return fail(res, 400, '请选择有效的图片文件');
@@ -58,7 +69,7 @@ module.exports = async (req, res) => {
         'User-Agent': 'lanyunyu-web'
       },
       body: JSON.stringify({
-        message: `upload image ${fname} via admin`,
+        message: `upload image ${fname} via ${uploader}`,
         branch: GITHUB_BRANCH,
         content: buf.toString('base64')
       })

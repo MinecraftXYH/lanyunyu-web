@@ -28,5 +28,11 @@ module.exports = async (req, res) => {
   user.updatedAt = Date.now();
   await writeUsers(data, 'login user ' + username);
 
-  return ok(res, { ok: true, token, username: user.username, qq: user.qq || '' });
+  return ok(res, {
+    ok: true, token,
+    username: user.username,
+    qq: user.qq || '',
+    avatar: user.avatar || 'assets/images/default-avatar.jpeg',
+    bio: user.bio || ''
+  });
 };

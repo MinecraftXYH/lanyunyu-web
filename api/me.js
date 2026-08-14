@@ -22,7 +22,14 @@ module.exports = async (req, res) => {
 
   const user = await authUser(req);
   if (!user) return fail(res, 401, '未登录或登录已过期');
-  return ok(res, { ok: true, username: user.username, qq: user.qq || '' });
+  return ok(res, {
+    ok: true,
+    username: user.username,
+    qq: user.qq || '',
+    avatar: user.avatar || 'assets/images/default-avatar.jpeg',
+    bio: user.bio || '',
+    createdAt: user.createdAt
+  });
 };
 
 // 供其他接口复用

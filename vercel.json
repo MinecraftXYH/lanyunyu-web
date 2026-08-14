@@ -35,6 +35,9 @@
     },
     "api/logout.js": {
       "includeFiles": "data/users.json"
+    },
+    "api/update-profile.js": {
+      "includeFiles": "data/users.json"
     }
   }
 }
