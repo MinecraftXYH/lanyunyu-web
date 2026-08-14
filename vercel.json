@@ -38,6 +38,21 @@
     },
     "api/update-profile.js": {
       "includeFiles": "data/users.json"
+    },
+    "api/posts.js": {
+      "includeFiles": "data/posts.json"
+    },
+    "api/posts/[id].js": {
+      "includeFiles": "data/posts.json"
+    },
+    "api/comments.js": {
+      "includeFiles": "data/comments.json"
+    },
+    "api/likes.js": {
+      "includeFiles": "data/likes.json"
+    },
+    "api/announcements.js": {
+      "includeFiles": "data/announcements.json"
     }
   }
 }

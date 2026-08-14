@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>玩家论坛 · 蓝云屿</title>
+  <link rel="stylesheet" href="assets/css/style.css?v=13" />
+  <link rel="icon" type="image/png" href="assets/images/logo.png?v=3" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="index.html"><img class="logo" src="assets/images/logo.png" alt="蓝云屿 logo" /> 蓝云屿</a>
+      <button class="nav-toggle" id="navToggle">菜单</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">首页</a>
+        <a href="about.html">介绍</a>
+        <a href="download.html">下载</a>
+        <a href="forum.html" class="active">论坛</a>
+        <a href="announcements.html">公告</a>
+        <a href="index.html#community">社区</a>
+        <a href="index.html#contact">联系</a>
+        <a href="account.html" id="navAccount" class="nav-login">登录 / 注册</a>
+        <span id="navExtra"></span>
+      </div>
+    </div>
+  </nav>
+
+  <section class="section" style="padding-top:120px;">
+    <div class="container">
+      <div class="section-head">
+        <h2>玩家论坛</h2>
+        <p>分享建筑、晒截图、找队友、聊日常</p>
+      </div>
+
+      <div id="postFormWrap" style="display:none;margin-bottom:24px;">
+        <div class="admin-card">
+          <h4 style="color:#fff;margin:0 0 14px;">发布新帖</h4>
+          <div class="admin-field">
+            <label>标题</label>
+            <input type="text" id="postTitle" maxlength="80" placeholder="标题" />
+          </div>
+          <div class="admin-field">
+            <label>分类</label>
+            <select id="postCategory">
+              <option value="闲聊">闲聊</option>
+              <option value="建筑展示">建筑展示</option>
+              <option value="招募">招募</option>
+              <option value="交易">交易</option>
+              <option value="攻略">攻略</option>
+            </select>
+          </div>
+          <div class="admin-field">
+            <label>内容</label>
+            <textarea id="postContent" rows="6" maxlength="5000" placeholder="想说点什么…"></textarea>
+          </div>
+          <button class="admin-btn primary" id="postSubmit">发布</button>
+          <button class="admin-btn secondary" id="postCancel" style="margin-left:8px;">取消</button>
+          <p class="auth-err" id="postErr"></p>
+        </div>
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <button class="admin-btn primary" id="showPostForm" style="display:none;">✏️ 发帖</button>
+        <span id="loginTip" style="color:#94a3b8;font-size:.9rem;margin-left:12px;"></span>
+      </div>
+
+      <div class="forum-list" id="forumList"></div>
+    </div>
+  </section>
+
+  <script src="assets/js/nav-user.js?v=3"></script>
+  <script src="assets/js/forum.js?v=1"></script>
+</body>
+</html>

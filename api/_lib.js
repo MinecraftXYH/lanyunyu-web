@@ -163,6 +163,23 @@ async function writeUsers(obj, message) {
   return writeJSON(USERS_FILE, obj, message || 'update users');
 }
 
+const DATA_FILES = {
+  posts: 'data/posts.json',
+  comments: 'data/comments.json',
+  likes: 'data/likes.json',
+  announcements: 'data/announcements.json'
+};
+
+async function readData(name) {
+  const fallback = { [name]: [] };
+  const data = await readJSON(DATA_FILES[name], fallback);
+  if (!data || !Array.isArray(data[name])) data[name] = [];
+  return data;
+}
+async function writeData(name, obj, message) {
+  return writeJSON(DATA_FILES[name], obj, message || 'update ' + name);
+}
+
 async function verifyUserToken(token) {
   if (!token) return null;
   const data = await readUsers();
@@ -174,5 +191,6 @@ module.exports = {
   TOKEN, ADMIN_USER, ADMIN_PWD,
   GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN,
   isAdmin, ok, fail, readJSON, writeJSON, readBody,
-  cors, hashPassword, verifyPassword, readUsers, writeUsers, verifyUserToken
+  cors, hashPassword, verifyPassword, readUsers, writeUsers, verifyUserToken,
+  readData, writeData
 };

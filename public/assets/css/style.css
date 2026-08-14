@@ -488,6 +488,31 @@ footer {
 }
 .avatar-upload { display: none; }
 
+/* ---------- 论坛 ---------- */
+.forum-list { display: flex; flex-direction: column; gap: 16px; }
+.forum-item {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: 16px; padding: 18px 20px;
+  backdrop-filter: blur(12px);
+}
+.forum-meta { display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: .85rem; flex-wrap: wrap; }
+.forum-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.forum-avatar.small { width: 24px; height: 24px; }
+.forum-author { color: #e2e8f0; font-weight: 600; }
+.forum-cat { background: rgba(255,255,255,.1); padding: 2px 8px; border-radius: 6px; font-size: .75rem; }
+.forum-time { color: #64748b; }
+.forum-title { display: block; color: #fff; font-size: 1.15rem; font-weight: 700; margin: 10px 0 6px; text-decoration: none; }
+.forum-title:hover { color: var(--accent); }
+.forum-summary { color: #94a3b8; font-size: .9rem; margin: 0 0 12px; line-height: 1.5; }
+.forum-stats { display: flex; gap: 16px; color: #94a3b8; font-size: .85rem; align-items: center; }
+.forum-body { color: #e2e8f0; line-height: 1.8; white-space: pre-wrap; }
+.like-btn { background: rgba(255,255,255,.08); border: 1px solid var(--glass-border); border-radius: 8px; color: #fca5a5; padding: 4px 10px; cursor: pointer; font: inherit; font-size: .85rem; }
+.like-btn.small { padding: 2px 8px; }
+.like-btn:hover { background: rgba(255,255,255,.14); }
+.comment-item { border-bottom: 1px solid rgba(255,255,255,.08); padding: 14px 0; }
+.comment-item:last-child { border-bottom: none; }
+.comment-body { color: #e2e8f0; line-height: 1.6; margin: 8px 0 10px; white-space: pre-wrap; }
+
 @media (max-width: 860px) {
   .nav-login { margin-top: 6px; justify-content: center; }
 }
