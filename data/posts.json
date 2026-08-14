@@ -11,6 +11,21 @@
       "views": 9,
       "likes": 1,
       "comments": 1
+    },
+    {
+      "id": "pmssrn84991sf",
+      "title": "这只是个测试",
+      "content": "很美",
+      "category": "闲聊",
+      "author": "Minecraft_SCX",
+      "images": [
+        "https://5nmkgek44wt3dd4b.public.blob.vercel-storage.com/forum/Minecraft_SCX/1786700996101-7fut2q-kIl0uIfdNcuRl2m1SsaMlhOH2GDlnF.png"
+      ],
+      "createdAt": 1786701001689,
+      "updatedAt": 1786701001689,
+      "views": 0,
+      "likes": 0,
+      "comments": 0
     }
   ]
 }
