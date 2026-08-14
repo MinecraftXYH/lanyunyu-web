@@ -16,7 +16,9 @@
       "avatar": "assets/images/default-avatar.jpeg",
       "bio": "",
       "createdAt": 1786727836623,
-      "updatedAt": 1786727836623
+      "updatedAt": 1786727837808,
+      "token": "971ae3609d5265bd2d88cdf45e0cbb41dd15419fed48731d",
+      "tokenExp": 1789319837808
     }
   ]
 }
