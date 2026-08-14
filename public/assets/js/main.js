@@ -91,11 +91,16 @@ function renderCommunity() {
 
   const nl = el('newsList');
   if (nl && DATA.announcements) {
-    nl.innerHTML = DATA.announcements.slice(0, 4).map(a => `
+    nl.innerHTML = DATA.announcements.slice(0, 4).map(a => {
+      const cover = (a.images && a.images.length) ? a.images[0] : '';
+      const coverAttr = cover ? esc(/^https?:\/\//i.test(cover) ? cover : '/' + cover) : '';
+      return `
       <div style="padding:14px 0; border-bottom:1px solid var(--glass-border);">
         <div style="font-weight:700;">${esc(a.title)}</div>
         <div class="hint" style="color:var(--muted); font-size:.85rem;">${esc(a.date)}</div>
-      </div>`).join('');
+        ${coverAttr ? `<img src="${coverAttr}" alt="公告封面" loading="lazy" style="width:100%; max-height:150px; object-fit:cover; border-radius:10px; margin-top:8px; border:1px solid var(--glass-border);" />` : ''}
+      </div>`;
+    }).join('');
   }
 }
 

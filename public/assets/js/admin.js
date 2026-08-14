@@ -146,6 +146,7 @@ function renderRepeat(key, containerId) {
       <div class="admin-row">
         ${REPEAT_SCHEMA[key].map(f => field([key, i, f.k], f.label, it && it[f.k], f.k === 'desc' || f.k === 'content' || f.k === 'note')).join('')}
       </div>
+      ${key === 'announcements' ? announcementImages(i, it) : ''}
     </div>`).join('');
 }
 
@@ -199,6 +200,26 @@ function screenshotUploadRow(i, it) {
     </div>`;
 }
 
+// 公告卡片里的「添加图片」区域（多图，最多 9 张）
+function announcementImages(i, it) {
+  const imgs = (it && Array.isArray(it.images)) ? it.images : [];
+  return `
+    <div class="upload-row" style="margin-top:12px; padding-top:12px; border-top:1px dashed #cbd5e1;">
+      <label class="admin-btn" style="background:#e2e8f0; color:#334155; cursor:pointer;">
+        📁 添加图片
+        <input type="file" accept="image/*" data-upload="annimg" data-idx="${i}" style="display:none;" />
+      </label>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+        ${imgs.map((src, j) => `
+          <div style="position:relative;">
+            <img src="${escAttr(/^https?:\/\//i.test(src) ? src : '/' + src)}" alt="图${j + 1}" style="width:120px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0;" />
+            <button class="admin-btn danger" data-delimg="${i},${j}" style="position:absolute; top:-8px; right:-8px; padding:2px 7px; font-size:.7rem; line-height:1;">×</button>
+          </div>`).join('')}
+      </div>
+      <p class="hint" style="color:#64748b; margin:8px 0 0;">选图后自动压缩上传，最多 9 张。最后记得点「保存更改」。</p>
+    </div>`;
+}
+
 // 客户端压缩：限制最大宽度，转 JPEG，避免超过 GitHub 1MB 单文件限制
 function resizeImageFile(file, maxW = 1280, quality = 0.82) {
   return new Promise((resolve, reject) => {
@@ -233,11 +254,24 @@ async function handleUpload(input) {
     const res = await fetch('/api/upload', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ name: file.name, dataUrl }) });
     const j = await res.json();
     if (j.ok) {
-      const path = key === 'screenshots' ? [key, 'items', i, 'src'] : [key, i, 'src'];
-      setByPath(EDIT, path, j.url);
-      if (key === 'screenshots') renderScreenshots();
-      else renderRepeat(key, key + 'List');
-      toast('✅ 已上传，记得点「保存更改」');
+      if (key === 'screenshots') {
+        setByPath(EDIT, [key, 'items', i, 'src'], j.url);
+        renderScreenshots();
+      } else if (key === 'annimg') {
+        if (!EDIT.announcements[i] || typeof EDIT.announcements[i] !== 'object') EDIT.announcements[i] = {};
+        if (!Array.isArray(EDIT.announcements[i].images)) EDIT.announcements[i].images = [];
+        if (EDIT.announcements[i].images.length >= 9) {
+          toast('最多 9 张图片');
+        } else {
+          EDIT.announcements[i].images.push(j.url);
+          toast('✅ 已添加图片，记得点「保存更改」');
+        }
+        renderRepeat('announcements', 'announcementsList');
+        populateBinds();
+      } else {
+        setByPath(EDIT, [key, i, 'src'], j.url);
+        renderRepeat(key, key + 'List');
+      }
     } else {
       toast('❌ 上传失败：' + (j.msg || ''));
     }
@@ -310,6 +344,14 @@ document.addEventListener('click', e => {
     } else {
       if (Array.isArray(EDIT[k])) EDIT[k].splice(i, 1);
       renderRepeat(k, k + 'List');
+    }
+  }
+  if (e.target.dataset.delimg) {
+    const [ai, aj] = e.target.dataset.delimg.split(',').map(Number);
+    if (EDIT.announcements && EDIT.announcements[ai] && Array.isArray(EDIT.announcements[ai].images)) {
+      EDIT.announcements[ai].images.splice(aj, 1);
+      renderRepeat('announcements', 'announcementsList');
+      populateBinds();
     }
   }
   if (e.target.dataset.add) {
