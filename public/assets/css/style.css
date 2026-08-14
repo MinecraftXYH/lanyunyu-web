@@ -392,14 +392,20 @@ footer {
 .login-box h2 { margin-top: 0; color: #fff; }
 
 /* ---------- 前台账号（登录/注册/个人中心） ---------- */
-.auth-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-.auth-tab {
-  flex: 1; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: 600;
-  border: 1px solid rgba(255,255,255,0.12); background: transparent; color: #94a3b8;
+.auth-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.auth-head h3 { margin: 0; font-size: 1.35rem; color: #fff; }
+.auth-back {
+  color: #94a3b8; font-size: .85rem; text-decoration: none;
+  padding: 4px 8px; border-radius: 8px; transition: .2s;
 }
-.auth-tab.active { background: rgba(255,255,255,0.10); color: #fff; border-color: rgba(255,255,255,0.20); }
+.auth-back:hover { color: #fff; background: rgba(255,255,255,0.08); }
 .auth-form .admin-btn.primary { margin-top: 4px; }
 .auth-err { color: #fca5a5; font-size: .85rem; margin-top: 10px; min-height: 1em; }
+.auth-toggle {
+  text-align: center; color: #94a3b8; font-size: .9rem; margin-top: 14px; margin-bottom: 0;
+}
+.auth-toggle a { color: #4ade80; text-decoration: none; font-weight: 600; }
+.auth-toggle a:hover { text-decoration: underline; }
 
 /* 导航栏登录入口高亮 */
 .nav-login {
@@ -410,7 +416,12 @@ footer {
   box-shadow: 0 4px 14px rgba(74,222,128,.25);
   transition: transform .15s, box-shadow .15s;
 }
-.nav-login:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(74,222,128,.35); }
+.nav-links a.nav-login:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: #052e16 !important;
+  box-shadow: 0 6px 18px rgba(74,222,128,.35);
+}
 
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);

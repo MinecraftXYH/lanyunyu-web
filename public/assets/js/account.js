@@ -38,16 +38,19 @@ function showAuth() {
   document.getElementById('accTitle').textContent = '登录 / 注册';
 }
 
-// 标签切换
-document.querySelectorAll('.auth-tab').forEach(function (t) {
-  t.addEventListener('click', function () {
-    document.querySelectorAll('.auth-tab').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    const tab = t.getAttribute('data-tab');
-    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('regForm').style.display = tab === 'register' ? 'block' : 'none';
-    setErr('loginErr', ''); setErr('regErr', '');
-  });
+function setMode(mode) {
+  const isLogin = mode === 'login';
+  document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('regForm').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('authModeTitle').textContent = isLogin ? '登录' : '注册';
+  setErr('loginErr', ''); setErr('regErr', '');
+}
+
+document.getElementById('toRegister').addEventListener('click', function (e) {
+  e.preventDefault(); setMode('register');
+});
+document.getElementById('toLogin').addEventListener('click', function (e) {
+  e.preventDefault(); setMode('login');
 });
 
 // 登录
@@ -93,7 +96,7 @@ document.getElementById('regForm').addEventListener('submit', async function (e)
       syncNav(); showProfile();
     } else {
       // 注册成功但自动登录失败，切到登录页
-      document.querySelector('.auth-tab[data-tab="login"]').click();
+      setMode('login');
       setErr('loginErr', '注册成功，请登录');
     }
   } else {
