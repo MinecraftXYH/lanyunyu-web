@@ -34,6 +34,8 @@ module.exports = async (req, res) => {
     username,
     pwdHash: hashPassword(pwd),
     qq: qq || '',
+    avatar: 'assets/images/default-avatar.jpeg',
+    bio: '',
     createdAt: Date.now(),
     updatedAt: Date.now()
   };

@@ -29,13 +29,11 @@ function showProfile() {
   document.getElementById('profileWrap').style.display = 'block';
   document.getElementById('profName').textContent = me.username;
   document.getElementById('profQq').textContent = me.qq ? ('已绑定 QQ：' + me.qq) : '未绑定 QQ（注册时可填）';
-  document.getElementById('accTitle').textContent = '个人中心';
 }
 
 function showAuth() {
   document.getElementById('authWrap').style.display = 'block';
   document.getElementById('profileWrap').style.display = 'none';
-  document.getElementById('accTitle').textContent = '登录 / 注册';
 }
 
 function setMode(mode) {
@@ -65,7 +63,8 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     token = r.data.token;
     localStorage.setItem(AUTH_KEY, token);
     me = { username: r.data.username, qq: r.data.qq };
-    syncNav(); showProfile();
+    syncNav();
+    location.href = 'index.html';
   } else {
     setErr('loginErr', r.data.msg || '登录失败');
   }
@@ -93,7 +92,8 @@ document.getElementById('regForm').addEventListener('submit', async function (e)
       token = lr.data.token;
       localStorage.setItem(AUTH_KEY, token);
       me = { username: lr.data.username, qq: lr.data.qq };
-      syncNav(); showProfile();
+      syncNav();
+      location.href = 'index.html';
     } else {
       // 注册成功但自动登录失败，切到登录页
       setMode('login');
