@@ -187,10 +187,15 @@ async function verifyUserToken(token) {
   return u || null;
 }
 
+function ensureArray(user, key) {
+  if (!Array.isArray(user[key])) user[key] = [];
+  return user[key];
+}
+
 module.exports = {
   TOKEN, ADMIN_USER, ADMIN_PWD,
   GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN,
   isAdmin, ok, fail, readJSON, writeJSON, readBody,
   cors, hashPassword, verifyPassword, readUsers, writeUsers, verifyUserToken,
-  readData, writeData
+  readData, writeData, ensureArray
 };

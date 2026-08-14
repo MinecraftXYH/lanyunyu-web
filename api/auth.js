@@ -34,6 +34,7 @@ module.exports = async (req, res) => {
     qq: user.qq || '',
     avatar: user.avatar || 'assets/images/default-avatar.jpeg',
     bio: user.bio || '',
-    following: Array.isArray(user.following) ? user.following : []
+    following: Array.isArray(user.following) ? user.following : [],
+    friends: Array.isArray(user.friends) ? user.friends : []
   });
 };

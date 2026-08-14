@@ -56,6 +56,7 @@ async function init() {
 function renderHeader() {
   const isMe = currentUser && currentUser.username === pageUser.username;
   const followBtn = isMe ? '' : `<button class="admin-btn ${pageUser.isFollowing ? 'secondary' : 'primary'}" id="followBtn">${pageUser.isFollowing ? '已关注' : '+ 关注'}</button>`;
+  const friendBtn = isMe ? '' : `<button class="admin-btn ${pageUser.isFriend ? 'secondary' : 'primary'}" id="friendBtn" style="margin-left:8px;">${pageUser.isFriend ? '已是好友' : '+ 好友'}</button>`;
   const qq = pageUser.qq ? `<span class="profile-meta">QQ: ${pageUser.qq}</span>` : '';
   const created = pageUser.createdAt ? `<span class="profile-meta">加入于 ${formatTime(pageUser.createdAt).split(' ')[0]}</span>` : '';
 
@@ -68,10 +69,11 @@ function renderHeader() {
           <span class="profile-meta">帖子 ${pageData.stats.posts}</span>
           <span class="profile-meta">评论 ${pageData.stats.comments}</span>
           <span class="profile-meta">获赞 ${pageData.stats.receivedLikes}</span>
+          <span class="profile-meta">好友 ${pageData.stats.friends}</span>
         </div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">${qq}${created}</div>
       </div>
-      ${followBtn}
+      <div style="margin-left:auto;display:flex;gap:8px;">${followBtn}${friendBtn}</div>
     </div>
     <div class="profile-bio">${escapeHtml(pageUser.bio) || '这个人很懒，什么都没写～'}</div>
   `;
@@ -90,6 +92,23 @@ async function toggleFollow() {
     pageUser.isFollowing = action === 'follow';
     renderHeader();
     document.getElementById('followBtn').addEventListener('click', toggleFollow);
+    document.getElementById('friendBtn').addEventListener('click', toggleFriend);
+  }
+}
+
+async function toggleFriend() {
+  if (!currentUser) return alert('请先登录');
+  const action = pageUser.isFriend ? 'remove' : 'add';
+  const r = await api('/api/friend', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ username: pageUser.username, action })
+  });
+  if (r.ok) {
+    pageUser.isFriend = action === 'add';
+    renderHeader();
+    document.getElementById('followBtn').addEventListener('click', toggleFollow);
+    document.getElementById('friendBtn').addEventListener('click', toggleFriend);
   }
 }
 

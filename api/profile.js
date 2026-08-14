@@ -41,6 +41,8 @@ module.exports = async (req, res) => {
     return false;
   }).length;
 
+  const isFriend = Array.isArray(user.friends) && currentUser && user.friends.includes(currentUser.username);
+
   return ok(res, {
     ok: true,
     user: {
@@ -49,12 +51,14 @@ module.exports = async (req, res) => {
       bio: user.bio || '',
       qq: user.qq || '',
       createdAt: user.createdAt,
-      isFollowing
+      isFollowing,
+      isFriend
     },
     stats: {
       posts: userPosts.length,
       comments: userComments,
-      receivedLikes
+      receivedLikes,
+      friends: Array.isArray(user.friends) ? user.friends.length : 0
     },
     posts: userPosts.map(p => ({
       id: p.id,

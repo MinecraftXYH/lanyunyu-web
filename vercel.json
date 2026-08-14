@@ -63,6 +63,9 @@
     },
     "api/profile.js": {
       "includeFiles": "data/users.json"
+    },
+    "api/friend.js": {
+      "includeFiles": "data/users.json"
     }
   }
 }
