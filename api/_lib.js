@@ -97,9 +97,10 @@ async function readJSON(file, fallback) {
   } catch (e) {
     console.error('GitHub read failed for', file, e.message);
   }
-  // 本地兜底：Vercel 打包时通过 includeFiles 把 api/*.json 带进运行目录
+  // 本地兜底：Vercel 打包时通过 includeFiles 把数据文件带进运行目录
   try {
     const candidates = [
+      path.join(process.cwd(), file),
       path.join(process.cwd(), 'api', file),
       path.join(__dirname, file)
     ];
@@ -151,14 +152,15 @@ function verifyPassword(pwd, stored) {
 }
 
 // ---------- 用户存储 ----------
+const USERS_FILE = 'data/users.json';
 async function readUsers() {
   const fallback = { users: [] };
-  const data = await readJSON('users.json', fallback);
+  const data = await readJSON(USERS_FILE, fallback);
   if (!data || !Array.isArray(data.users)) data.users = [];
   return data;
 }
 async function writeUsers(obj, message) {
-  return writeJSON('users.json', obj, message || 'update users');
+  return writeJSON(USERS_FILE, obj, message || 'update users');
 }
 
 module.exports = {

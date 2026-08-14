@@ -22,19 +22,19 @@
       "includeFiles": "api/contacts.json"
     },
     "api/register.js": {
-      "includeFiles": "api/users.json"
+      "includeFiles": "data/users.json"
     },
     "api/auth.js": {
-      "includeFiles": "api/users.json"
+      "includeFiles": "data/users.json"
     },
     "api/me.js": {
-      "includeFiles": "api/users.json"
+      "includeFiles": "data/users.json"
     },
     "api/change-pwd.js": {
-      "includeFiles": "api/users.json"
+      "includeFiles": "data/users.json"
     },
     "api/logout.js": {
-      "includeFiles": "api/users.json"
+      "includeFiles": "data/users.json"
     }
   }
 }
