@@ -1,3 +1,16 @@
 {
-  "posts": []
+  "posts": [
+    {
+      "id": "pmssl4ti0dfml",
+      "title": "我造了！这只是测试！",
+      "content": "啥也没有",
+      "category": "闲聊",
+      "author": "Minecraft_SCX",
+      "createdAt": 1786690065240,
+      "updatedAt": 1786690065240,
+      "views": 0,
+      "likes": 0,
+      "comments": 0
+    }
+  ]
 }
