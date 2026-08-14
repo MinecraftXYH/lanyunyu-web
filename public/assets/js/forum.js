@@ -64,13 +64,84 @@ function previewImages() {
   });
 }
 
+// 单图大小上限（Blob 直传路径支持到 10MB；回退到 GitHub 时服务端仍限 1MB）
+const MAX_BLOB_BYTES = 10 * 1024 * 1024;
+
+// 解码 Vercel Blob clientToken：storeId 在第 4 段（下划线分隔）
+function blobStoreIdFromToken(clientToken) {
+  const parts = clientToken.split('_');
+  return parts[3] || '';
+}
+
+// 通过 Vercel Blob 浏览器直传，拿到图片公开 URL。失败抛错由调用方回退 GitHub。
+async function uploadOneBlob(file, pathname) {
+  const evt = {
+    type: 'blob.generate-client-token',
+    payload: { pathname, clientPayload: null, multipart: false }
+  };
+  const res = await fetch('/api/blob-upload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify(evt)
+  });
+  if (!res.ok) {
+    const j = await res.json().catch(() => ({}));
+    if (j.msg === 'BLOB_DISABLED') throw new Error('BLOB_DISABLED');
+    throw new Error('token failed');
+  }
+  const { clientToken } = await res.json();
+  const storeId = blobStoreIdFromToken(clientToken);
+  // Vercel Blob 直传：PUT 到官方 Blob API 网关，由 storeId + token 路由到对应存储
+  const url = `https://vercel.com/api/blob/?pathname=${encodeURIComponent(pathname)}`;
+  const putRes = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'authorization': 'Bearer ' + clientToken,
+      'x-vercel-blob-store-id': storeId,
+      'x-api-version': '12',
+      'content-type': file.type || 'application/octet-stream',
+      'x-content-type': file.type || 'application/octet-stream'
+    },
+    body: file
+  });
+  if (!putRes.ok) throw new Error('put failed ' + putRes.status);
+  const out = await putRes.json();
+  if (!out.url) throw new Error('no url');
+  return out.url;
+}
+
 async function uploadImages() {
   const input = document.getElementById('postImages');
   const files = Array.from(input.files).slice(0, 9);
   const urls = [];
+
+  // 先尝试 Vercel Blob 直传（支持到 10MB，不经过函数体，不进 Git 仓库）
+  let useBlob = true;
   for (const file of files) {
+    if (file.size > MAX_BLOB_BYTES) {
+      document.getElementById('postErr').textContent = '图片「' + file.name + '」超过 10MB，请压缩后重试';
+      throw new Error('too large');
+    }
+    const ext = (file.name.split('.').pop() || 'jpg').replace(/[^\w]/g, '').slice(0, 6);
+    const pathname = `forum/${currentUser ? currentUser.username : 'guest'}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    if (useBlob) {
+      try {
+        const u = await uploadOneBlob(file, pathname);
+        urls.push(u);
+        continue;
+      } catch (e) {
+        if (String(e.message) === 'BLOB_DISABLED') {
+          // 后端未配置 Blob：回退 GitHub 方案（限 1MB）
+          useBlob = false;
+        } else {
+          document.getElementById('postErr').textContent = '图片上传失败，请重试';
+          throw e;
+        }
+      }
+    }
+    // 回退路径：GitHub 上传接口（限 1MB）
     if (file.size > 1024 * 1024) {
-      document.getElementById('postErr').textContent = '图片「' + file.name + '」超过 1MB，请压缩后重试';
+      document.getElementById('postErr').textContent = '图片「' + file.name + '」超过 1MB（当前使用备用上传），请压缩后重试';
       throw new Error('too large');
     }
     const dataUrl = await fileToDataUrl(file);

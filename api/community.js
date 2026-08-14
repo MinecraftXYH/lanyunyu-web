@@ -134,7 +134,7 @@ async function handlePosts(req, res, url) {
       content,
       category,
       author: user.username,
-      images: Array.isArray(body.images) ? body.images.filter(x => typeof x === 'string' && /^assets\/images\//.test(x)).slice(0, 9) : [],
+      images: Array.isArray(body.images) ? body.images.filter(x => typeof x === 'string' && (/^assets\/images\//.test(x) || /^https?:\/\//.test(x))).slice(0, 9) : [],
       createdAt: Date.now(),
       updatedAt: Date.now(),
       views: 0,
