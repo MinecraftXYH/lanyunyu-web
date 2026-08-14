@@ -1,3 +1,11 @@
 {
-  "likes": []
+  "likes": [
+    {
+      "id": "lmssl9ufr",
+      "type": "post",
+      "targetId": "pmssl4ti0dfml",
+      "username": "Minecraft_SCX",
+      "createdAt": 1786690299735
+    }
+  ]
 }
