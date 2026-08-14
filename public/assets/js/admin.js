@@ -340,7 +340,7 @@ document.addEventListener('click', e => {
 async function doLogin() {
   const user = document.getElementById('userInput').value;
   const pwd = document.getElementById('pwdInput').value;
-  const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user, pwd }) });
+  const res = await fetch('/api/site?action=login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user, pwd }) });
   const j = await res.json();
   if (j.ok) {
     TOKEN = j.token; localStorage.setItem(AUTH_KEY, TOKEN);
