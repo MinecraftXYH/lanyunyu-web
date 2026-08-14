@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>玩家论坛 · 蓝云屿</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=14" />
+  <title>玩家论坛 · 蓝云�?/title>
+  <link rel="stylesheet" href="assets/css/style.css?v=15" />
   <link rel="icon" type="image/png" href="assets/images/logo.png?v=3" />
 </head>
 <body>
   <nav class="navbar">
     <div class="navbar-inner">
-      <a class="brand" href="index.html"><img class="logo" src="assets/images/logo.png" alt="蓝云屿 logo" /> 蓝云屿</a>
+      <a class="brand" href="index.html"><img class="logo" src="assets/images/logo.png" alt="蓝云�?logo" /> 蓝云�?/a>
       <button class="nav-toggle" id="navToggle">菜单</button>
       <div class="nav-links" id="navLinks">
         <a href="index.html">首页</a>
@@ -52,7 +52,12 @@
           </div>
           <div class="admin-field">
             <label>内容</label>
-            <textarea id="postContent" rows="6" maxlength="5000" placeholder="想说点什么…"></textarea>
+            <textarea id="postContent" rows="6" maxlength="5000" placeholder="想说点什么�?></textarea>
+          </div>
+          <div class="admin-field">
+            <label>图片（可选，最�?9 张，单张 �?1MB�?/label>
+            <input type="file" id="postImages" accept="image/*" multiple />
+            <div id="postImagePreview" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;"></div>
           </div>
           <button class="admin-btn primary" id="postSubmit">发布</button>
           <button class="admin-btn secondary" id="postCancel" style="margin-left:8px;">取消</button>
@@ -70,6 +75,6 @@
   </section>
 
   <script src="assets/js/nav-user.js?v=5"></script>
-  <script src="assets/js/forum.js?v=2"></script>
+  <script src="assets/js/forum.js?v=3"></script>
 </body>
 </html>

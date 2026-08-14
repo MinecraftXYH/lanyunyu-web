@@ -39,7 +39,53 @@ async function init() {
     document.getElementById('postFormWrap').style.display = 'none';
     document.getElementById('showPostForm').style.display = 'inline-block';
   });
+  document.getElementById('postImages').addEventListener('change', previewImages);
   document.getElementById('postSubmit').addEventListener('click', submitPost);
+}
+
+async function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function previewImages() {
+  const input = document.getElementById('postImages');
+  const box = document.getElementById('postImagePreview');
+  box.innerHTML = '';
+  Array.from(input.files).slice(0, 9).forEach(file => {
+    const img = document.createElement('img');
+    img.style.cssText = 'width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.15);';
+    fileToDataUrl(file).then(u => img.src = u);
+    box.appendChild(img);
+  });
+}
+
+async function uploadImages() {
+  const input = document.getElementById('postImages');
+  const files = Array.from(input.files).slice(0, 9);
+  const urls = [];
+  for (const file of files) {
+    if (file.size > 1024 * 1024) {
+      document.getElementById('postErr').textContent = '图片「' + file.name + '」超过 1MB，请压缩后重试';
+      throw new Error('too large');
+    }
+    const dataUrl = await fileToDataUrl(file);
+    const r = await api('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ dataUrl, name: file.name })
+    });
+    if (!r.ok) {
+      document.getElementById('postErr').textContent = (r.data && r.data.msg) || '图片上传失败';
+      throw new Error('upload failed');
+    }
+    urls.push(r.data.url);
+  }
+  return urls;
 }
 
 async function loadPosts() {
@@ -55,6 +101,7 @@ async function loadPosts() {
   }
   list.innerHTML = r.data.posts.map(p => `
     <div class="forum-item">
+      ${p.cover ? `<a href="forum-post.html?id=${p.id}"><img class="forum-cover" src="${p.cover}" alt="" /></a>` : ''}
       <div class="forum-meta">
         <img class="forum-avatar" src="${p.avatar}" alt="" />
         <a href="profile.html?u=${encodeURIComponent(p.author)}" class="forum-author">${p.author}</a>
@@ -67,6 +114,7 @@ async function loadPosts() {
         <span>👁 ${p.views}</span>
         <span>❤️ ${p.likes}</span>
         <span>💬 ${p.comments}</span>
+        ${p.imageCount ? `<span>🖼️ ${p.imageCount}</span>` : ''}
       </div>
     </div>
   `).join('');
@@ -76,22 +124,39 @@ async function submitPost() {
   const title = document.getElementById('postTitle').value.trim();
   const content = document.getElementById('postContent').value.trim();
   const category = document.getElementById('postCategory').value;
-  document.getElementById('postErr').textContent = '';
-  if (!title || !content) return document.getElementById('postErr').textContent = '标题和内容不能为空';
+  const errEl = document.getElementById('postErr');
+  errEl.textContent = '';
+  if (!title || !content) return errEl.textContent = '标题和内容不能为空';
 
-  const r = await api('/api/community?action=posts', {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ title, content, category })
-  });
-  if (r.ok) {
-    document.getElementById('postTitle').value = '';
-    document.getElementById('postContent').value = '';
-    document.getElementById('postFormWrap').style.display = 'none';
-    document.getElementById('showPostForm').style.display = 'inline-block';
-    await loadPosts();
-  } else {
-    document.getElementById('postErr').textContent = r.data.msg || '发布失败';
+  const btn = document.getElementById('postSubmit');
+  btn.disabled = true;
+  btn.textContent = '发布中…';
+  try {
+    let images = [];
+    if (document.getElementById('postImages').files.length) {
+      images = await uploadImages();
+    }
+    const r = await api('/api/community?action=posts', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ title, content, category, images })
+    });
+    if (r.ok) {
+      document.getElementById('postTitle').value = '';
+      document.getElementById('postContent').value = '';
+      document.getElementById('postImages').value = '';
+      document.getElementById('postImagePreview').innerHTML = '';
+      document.getElementById('postFormWrap').style.display = 'none';
+      document.getElementById('showPostForm').style.display = 'inline-block';
+      await loadPosts();
+    } else {
+      errEl.textContent = r.data.msg || '发布失败';
+    }
+  } catch (e) {
+    if (!errEl.textContent) errEl.textContent = '发布失败，请重试';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '发布';
   }
 }
 

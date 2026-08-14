@@ -56,6 +56,8 @@ async function handlePosts(req, res, url) {
         author: p.author,
         avatar: avatars[p.author] || 'assets/images/default-avatar.jpeg',
         category: p.category || '闲聊',
+        cover: (Array.isArray(p.images) && p.images[0]) || '',
+        imageCount: Array.isArray(p.images) ? p.images.length : 0,
         createdAt: p.createdAt,
         likes: p.likes || 0,
         comments: p.comments || 0,
@@ -72,6 +74,10 @@ async function handlePosts(req, res, url) {
     post.views = (post.views || 0) + 1;
     await writeData('posts', data, 'view post ' + id);
 
+    const auth = req.headers.authorization || '';
+    const me = auth.startsWith('Bearer ') ? await verifyUserToken(auth.slice(7)) : null;
+    const ldata = await readData('likes');
+
     const avatars = await avatarMap();
     const commentsData = await readData('comments');
     const comments = commentsData.comments
@@ -83,7 +89,8 @@ async function handlePosts(req, res, url) {
         author: c.author,
         avatar: avatars[c.author] || 'assets/images/default-avatar.jpeg',
         createdAt: c.createdAt,
-        likes: c.likes || 0
+        likes: c.likes || 0,
+        liked: !!(me && ldata.likes.find(l => l.type === 'comment' && l.targetId === c.id && l.username === me.username))
       }));
 
     return ok(res, {
@@ -95,6 +102,8 @@ async function handlePosts(req, res, url) {
         author: post.author,
         avatar: avatars[post.author] || 'assets/images/default-avatar.jpeg',
         category: post.category || '闲聊',
+        images: Array.isArray(post.images) ? post.images : [],
+        liked: !!(me && ldata.likes.find(l => l.type === 'post' && l.targetId === post.id && l.username === me.username)),
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
         views: post.views,
@@ -125,6 +134,7 @@ async function handlePosts(req, res, url) {
       content,
       category,
       author: user.username,
+      images: Array.isArray(body.images) ? body.images.filter(x => typeof x === 'string' && /^assets\/images\//.test(x)).slice(0, 9) : [],
       createdAt: Date.now(),
       updatedAt: Date.now(),
       views: 0,
@@ -221,6 +231,24 @@ async function handleComments(req, res, url) {
 }
 
 async function handleLikes(req, res) {
+  if (req.method === 'GET') {
+    const url = new URL(req.url, 'http://localhost');
+    const targetId = (url.searchParams.get('targetId') || '').trim();
+    const type = url.searchParams.get('type') === 'comment' ? 'comment' : 'post';
+    if (!targetId) return fail(res, 400, '缺少目标 ID');
+
+    const ldata = await readData('likes');
+    const count = ldata.likes.filter(l => l.type === type && l.targetId === targetId).length;
+
+    let liked = false;
+    const auth = req.headers.authorization || '';
+    if (auth.startsWith('Bearer ')) {
+      const me = await verifyUserToken(auth.slice(7));
+      if (me) liked = !!ldata.likes.find(l => l.type === type && l.targetId === targetId && l.username === me.username);
+    }
+    return ok(res, { ok: true, liked, count });
+  }
+
   if (req.method !== 'POST') return fail(res, 405, '不支持的方法');
   const user = await requireAuth(req, res);
   if (!user) return;
