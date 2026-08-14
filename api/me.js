@@ -28,7 +28,8 @@ module.exports = async (req, res) => {
     qq: user.qq || '',
     avatar: user.avatar || 'assets/images/default-avatar.jpeg',
     bio: user.bio || '',
-    createdAt: user.createdAt
+    createdAt: user.createdAt,
+    following: Array.isArray(user.following) ? user.following : []
   });
 };
 

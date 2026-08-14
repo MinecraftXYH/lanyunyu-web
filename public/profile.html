@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>个人主页 · 蓝云屿</title>
+  <link rel="stylesheet" href="assets/css/style.css?v=13" />
+  <link rel="icon" type="image/png" href="assets/images/logo.png?v=3" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="index.html"><img class="logo" src="assets/images/logo.png" alt="蓝云屿 logo" /> 蓝云屿</a>
+      <button class="nav-toggle" id="navToggle">菜单</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">首页</a>
+        <a href="about.html">介绍</a>
+        <a href="download.html">下载</a>
+        <a href="forum.html">论坛</a>
+        <a href="announcements.html">公告</a>
+        <a href="index.html#community">社区</a>
+        <a href="index.html#contact">联系</a>
+        <a href="account.html" id="navAccount" class="nav-login">登录 / 注册</a>
+        <span id="navExtra"></span>
+      </div>
+    </div>
+  </nav>
+
+  <section class="section" style="padding-top:120px;">
+    <div class="container" style="max-width:800px;">
+      <div class="admin-card" id="profileCard">
+        <div class="profile-loading">加载中…</div>
+      </div>
+
+      <div class="profile-tabs" id="profileTabs" style="display:none;">
+        <button class="profile-tab active" data-tab="posts">帖子</button>
+        <button class="profile-tab" data-tab="comments">评论</button>
+        <button class="profile-tab" data-tab="likes">获赞</button>
+      </div>
+
+      <div id="tabPosts" class="profile-tab-content"></div>
+      <div id="tabComments" class="profile-tab-content" style="display:none;"></div>
+      <div id="tabLikes" class="profile-tab-content" style="display:none;"></div>
+    </div>
+  </section>
+
+  <script src="assets/js/nav-user.js?v=3"></script>
+  <script src="assets/js/profile.js?v=1"></script>
+</body>
+</html>

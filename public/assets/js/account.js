@@ -193,6 +193,11 @@ document.getElementById('avatarInput').addEventListener('change', async function
   reader.readAsDataURL(file);
 });
 
+// 我的主页
+document.getElementById('myProfileBtn').addEventListener('click', function () {
+  if (me && me.username) location.href = 'profile.html?u=' + encodeURIComponent(me.username);
+});
+
 // 登出
 document.getElementById('logoutBtn').addEventListener('click', async function () {
   await api('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });

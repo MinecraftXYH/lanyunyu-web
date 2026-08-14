@@ -57,7 +57,7 @@ async function loadPosts() {
     <div class="forum-item">
       <div class="forum-meta">
         <img class="forum-avatar" src="${p.avatar}" alt="" />
-        <span class="forum-author">${p.author}</span>
+        <a href="profile.html?u=${encodeURIComponent(p.author)}" class="forum-author">${p.author}</a>
         <span class="forum-cat">${p.category}</span>
         <span class="forum-time">${formatTime(p.createdAt)}</span>
       </div>

@@ -54,7 +54,7 @@ async function loadPost() {
   card.innerHTML = `
     <div class="forum-meta" style="margin-bottom:14px;">
       <img class="forum-avatar" src="${p.avatar}" alt="" />
-      <span class="forum-author">${p.author}</span>
+      <a href="profile.html?u=${encodeURIComponent(p.author)}" class="forum-author">${p.author}</a>
       <span class="forum-cat">${p.category}</span>
       <span class="forum-time">${formatTime(p.createdAt)}</span>
     </div>
@@ -83,7 +83,7 @@ function renderComments(comments) {
     <div class="comment-item">
       <div class="forum-meta">
         <img class="forum-avatar small" src="${c.avatar}" alt="" />
-        <span class="forum-author">${c.author}</span>
+        <a href="profile.html?u=${encodeURIComponent(c.author)}" class="forum-author">${c.author}</a>
         <span class="forum-time">${formatTime(c.createdAt)}</span>
       </div>
       <p class="comment-body">${escapeHtml(c.content).replace(/\n/g, '<br>')}</p>

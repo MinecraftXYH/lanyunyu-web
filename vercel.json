@@ -6,7 +6,11 @@
     { "source": "/account", "destination": "/public/account.html" },
     { "source": "/about", "destination": "/public/about.html" },
     { "source": "/download", "destination": "/public/download.html" },
-    { "source": "/assets/(.*)", "destination": "/public/assets/$1" }
+    { "source": "/assets/(.*)", "destination": "/public/assets/$1" },
+    { "source": "/forum", "destination": "/public/forum.html" },
+    { "source": "/forum/post/(.*)", "destination": "/public/forum-post.html" },
+    { "source": "/announcements", "destination": "/public/announcements.html" },
+    { "source": "/profile", "destination": "/public/profile.html" }
   ],
   "functions": {
     "api/config.js": {
@@ -53,6 +57,12 @@
     },
     "api/announcements.js": {
       "includeFiles": "data/announcements.json"
+    },
+    "api/follow.js": {
+      "includeFiles": "data/users.json"
+    },
+    "api/profile.js": {
+      "includeFiles": "data/users.json"
     }
   }
 }
