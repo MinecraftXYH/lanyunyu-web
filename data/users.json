@@ -8,6 +8,15 @@
       "updatedAt": 1786691087510,
       "token": "56ea93f8f5349eba1de873007040aeb3c713b3be840cebcc",
       "tokenExp": 1789283087510
+    },
+    {
+      "username": "admin",
+      "pwdHash": "bfbb55cf993abdc880f2b900a20ccd8b$41fba7b899d664083740ff101dabf0204f4954645f615c36b65afb47d600b70a",
+      "qq": "",
+      "avatar": "assets/images/default-avatar.jpeg",
+      "bio": "",
+      "createdAt": 1786727836623,
+      "updatedAt": 1786727836623
     }
   ]
 }
