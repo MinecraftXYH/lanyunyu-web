@@ -3,6 +3,9 @@
   "trailingSlash": false,
   "rewrites": [
     { "source": "/(.*\\.html)", "destination": "/public/$1" },
+    { "source": "/account", "destination": "/public/account.html" },
+    { "source": "/about", "destination": "/public/about.html" },
+    { "source": "/download", "destination": "/public/download.html" },
     { "source": "/assets/(.*)", "destination": "/public/assets/$1" }
   ],
   "functions": {
