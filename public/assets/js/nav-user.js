@@ -13,6 +13,7 @@
     if (uname) {
       link.textContent = '👤 ' + uname;
       link.href = 'account.html';
+      link.classList.add('nav-login');
       if (!extra) return;
       extra.innerHTML = '';
       const btn = document.createElement('button');
@@ -25,8 +26,9 @@
       });
       extra.appendChild(btn);
     } else {
-      link.textContent = '玩家中心';
+      link.textContent = '登录 / 注册';
       link.href = 'account.html';
+      link.classList.add('nav-login');
       if (extra) extra.innerHTML = '';
     }
   };

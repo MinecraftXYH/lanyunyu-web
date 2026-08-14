@@ -401,6 +401,17 @@ footer {
 .auth-form .admin-btn.primary { margin-top: 4px; }
 .auth-err { color: #fca5a5; font-size: .85rem; margin-top: 10px; min-height: 1em; }
 
+/* 导航栏登录入口高亮 */
+.nav-login {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 999px;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: #052e16 !important; font-weight: 700;
+  box-shadow: 0 4px 14px rgba(74,222,128,.25);
+  transition: transform .15s, box-shadow .15s;
+}
+.nav-login:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(74,222,128,.35); }
+
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   background: #10b981; color: #fff; padding: 12px 22px; border-radius: 10px;
@@ -450,6 +461,10 @@ footer {
   padding: 6px 12px; font: inherit; font-size: .85rem; cursor: pointer;
 }
 .nav-logout:hover { color: var(--text); }
+
+@media (max-width: 860px) {
+  .nav-login { margin-top: 6px; justify-content: center; }
+}
 
 
 @media (max-width: 860px) {
