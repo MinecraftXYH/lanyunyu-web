@@ -21,7 +21,7 @@ async function refreshMe() {
 
 // 同步导航栏入口（与 nav-user.js 共用）
 function syncNav() {
-  if (window.__updateNavState) window.__updateNavState(me && me.username ? me.username : null);
+  if (window.__updateNavState) window.__updateNavState(me && me.username ? me : null);
 }
 
 function showProfile() {

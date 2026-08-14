@@ -1,9 +1,9 @@
-// 蓝云屿前端脚本：从 /api/config 读取内容并渲染
+// 蓝云屿前端脚本：从 /api/site?action=config 读取内容并渲染
 let DATA = {};
 
 async function loadData() {
   try {
-    const res = await fetch('/api/config', { cache: 'no-store' });
+    const res = await fetch('/api/site?action=config', { cache: 'no-store' });
     DATA = await res.json();
   } catch (e) {
     DATA = {};
