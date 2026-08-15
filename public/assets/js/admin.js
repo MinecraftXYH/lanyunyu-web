@@ -382,17 +382,34 @@ document.addEventListener('click', e => {
 async function doLogin() {
   const user = document.getElementById('userInput').value;
   const pwd = document.getElementById('pwdInput').value;
-  const res = await fetch('/api/site?action=login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user, pwd }) });
-  const j = await res.json();
+  const errEl = document.getElementById('loginErr');
+  let res;
+  try {
+    res = await fetch('/api/site?action=login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user, pwd }) });
+  } catch (e) {
+    errEl.textContent = '网络错误，无法连接服务器：' + e.message;
+    errEl.style.display = 'block';
+    return;
+  }
+  let j = {};
+  try { j = await res.json(); } catch (e) {}
   if (j.ok) {
     TOKEN = j.token; localStorage.setItem(AUTH_KEY, TOKEN);
+    errEl.style.display = 'none';
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('adminFrame').style.display = 'flex';
     loadConfig();
     loadContacts();
     checkHealth();
   } else {
-    document.getElementById('loginErr').style.display = 'block';
+    if (res.status === 401) {
+      errEl.textContent = '账号或密码错误';
+    } else if (res.status === 403 || res.status === 404) {
+      errEl.textContent = '登录被限制：当前网络/IP 可能已被临时封锁（多次输错密码，或访问过 /admin、/login 等诱饵地址所致）。请更换网络后重试，或联系管理员解封。';
+    } else {
+      errEl.textContent = '登录失败（服务器返回 ' + res.status + '）：' + (j.msg || '');
+    }
+    errEl.style.display = 'block';
   }
 }
 
