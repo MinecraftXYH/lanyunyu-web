@@ -58,6 +58,12 @@ document.getElementById('toLogin').addEventListener('click', function (e) {
   e.preventDefault(); setMode('login');
 });
 
+// 登录后跳转目标：带 redirect 参数则返回原页面，否则回首页
+function redirectTarget() {
+  const p = new URLSearchParams(location.search).get('redirect');
+  return p ? p : 'index.html';
+}
+
 // 登录
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
@@ -71,7 +77,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     localStorage.setItem(AUTH_KEY, token);
     me = r.data;
     syncNav();
-    location.href = 'index.html';
+    location.href = redirectTarget();
   } else {
     setErr('loginErr', r.data.msg || '登录失败');
   }
@@ -100,7 +106,7 @@ document.getElementById('regForm').addEventListener('submit', async function (e)
       localStorage.setItem(AUTH_KEY, token);
       me = lr.data;
       syncNav();
-      location.href = 'index.html';
+      location.href = redirectTarget();
     } else {
       // 注册成功但自动登录失败，切到登录页
       setMode('login');

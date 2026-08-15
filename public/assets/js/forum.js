@@ -21,13 +21,14 @@ async function init() {
     if (r.ok) currentUser = r.data;
   }
 
-  if (currentUser) {
-    document.getElementById('showPostForm').style.display = 'inline-block';
-    document.getElementById('loginTip').textContent = '';
-  } else {
-    document.getElementById('showPostForm').style.display = 'none';
-    document.getElementById('loginTip').textContent = '登录后即可发帖';
+  // 未登录：跳转登录/注册页，登录后返回论坛
+  if (!currentUser) {
+    location.href = 'account.html?redirect=' + encodeURIComponent('forum.html');
+    return;
   }
+
+  document.getElementById('showPostForm').style.display = 'inline-block';
+  document.getElementById('loginTip').textContent = '';
 
   await loadPosts();
 
