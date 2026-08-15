@@ -5,12 +5,10 @@
       "pwdHash": "db5f5bb573974e3044831da7f5507d4a$c382484f428be5e1ff08939a5fe17534263f505dceccbb425a1031679d0c80cf",
       "qq": "",
       "createdAt": 1786685407863,
-      "updatedAt": 1786757935984,
+      "updatedAt": 1786757937722,
       "token": "56ea93f8f5349eba1de873007040aeb3c713b3be840cebcc",
       "tokenExp": 1789283087510,
-      "following": [
-        "admin"
-      ]
+      "following": []
     },
     {
       "username": "admin",
