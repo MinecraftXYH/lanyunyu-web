@@ -5,9 +5,12 @@
       "pwdHash": "db5f5bb573974e3044831da7f5507d4a$c382484f428be5e1ff08939a5fe17534263f505dceccbb425a1031679d0c80cf",
       "qq": "",
       "createdAt": 1786685407863,
-      "updatedAt": 1786691087510,
+      "updatedAt": 1786757942369,
       "token": "56ea93f8f5349eba1de873007040aeb3c713b3be840cebcc",
-      "tokenExp": 1789283087510
+      "tokenExp": 1789283087510,
+      "following": [],
+      "friends": [],
+      "friendRequests": []
     },
     {
       "username": "admin",
@@ -18,7 +21,20 @@
       "createdAt": 1786727836623,
       "updatedAt": 1786727837808,
       "token": "971ae3609d5265bd2d88cdf45e0cbb41dd15419fed48731d",
-      "tokenExp": 1789319837808
+      "tokenExp": 1789319837808,
+      "friends": [],
+      "friendRequests": []
+    },
+    {
+      "username": "rjcsyyds",
+      "pwdHash": "56e0a1ff67b52ae69c1e183d2762b954$c342884a5b0df0f99079f5684e2dee22b692d1a7be784bcb1a67a2686f93447f",
+      "qq": "780133024",
+      "avatar": "assets/images/default-avatar.jpeg",
+      "bio": "",
+      "createdAt": 1786757968014,
+      "updatedAt": 1786757979254,
+      "token": "389f1eedf44ab6ec06f49a6980f1dac70fbc13914149da6d",
+      "tokenExp": 1789349979254
     }
   ]
 }
