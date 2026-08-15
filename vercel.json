@@ -24,12 +24,12 @@
     { "source": "/forum/post/(.*)", "destination": "/public/forum-post.html" },
     { "source": "/announcements", "destination": "/public/announcements.html" },
     { "source": "/profile", "destination": "/public/profile.html" },
-    { "source": "/admin", "destination": "/public/honeypot.html" },
-    { "source": "/manage", "destination": "/public/honeypot.html" },
-    { "source": "/backend", "destination": "/public/honeypot.html" },
-    { "source": "/wp-admin", "destination": "/public/honeypot.html" },
-    { "source": "/administrator", "destination": "/public/honeypot.html" },
-    { "source": "/login", "destination": "/public/honeypot.html" }
+    { "source": "/admin", "destination": "/honeypot" },
+    { "source": "/manage", "destination": "/honeypot" },
+    { "source": "/backend", "destination": "/honeypot" },
+    { "source": "/wp-admin", "destination": "/honeypot" },
+    { "source": "/administrator", "destination": "/honeypot" },
+    { "source": "/login", "destination": "/honeypot" }
   ],
   "functions": {
     "api/site.js": {
