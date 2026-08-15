@@ -24,6 +24,15 @@
       "tokenExp": 1789319837808,
       "friends": [],
       "friendRequests": []
+    },
+    {
+      "username": "rjcsyyds",
+      "pwdHash": "56e0a1ff67b52ae69c1e183d2762b954$c342884a5b0df0f99079f5684e2dee22b692d1a7be784bcb1a67a2686f93447f",
+      "qq": "780133024",
+      "avatar": "assets/images/default-avatar.jpeg",
+      "bio": "",
+      "createdAt": 1786757968014,
+      "updatedAt": 1786757968014
     }
   ]
 }
