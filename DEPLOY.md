@@ -44,6 +44,8 @@ git push
    - `GITHUB_REPO` = `MinecraftXYH/lanyunyu-web`
    - `LYY_ADMIN_USER` = `admin`（可选，默认就是 admin）
    - `LYY_ADMIN_PWD` = `lyy20260701`（可选，默认就是这个）
+   - `KV_REST_API_URL` = （可选）Vercel KV / Upstash 的 REST URL。**配置后，登录失败超限与被假后台诱饵捕获的 IP 会被持久拉黑（跨实例共享）**；不配则仅在单次函数实例内内存限流，重启/扩容后失效。
+   - `KV_REST_API_TOKEN` = 对应的 REST Token（与上面成对出现）
 6. 点 **Deploy**
 
 等 1-2 分钟，部署完成会给你一个网址 `lanyunyu-web.vercel.app`，打开看效果。
@@ -60,9 +62,10 @@ git push
 
 ### 5. 后台管理
 
-- 后台地址：`https://你的域名/admin.html`
+- 后台地址：`https://你的域名/c6p98uy4bu.html`
+- ⚠️ **该地址是随机字符串、已隐藏，请勿写入任何页面或分享给他人；旧地址 `/admin.html` 已失效。**
 - 账号：`admin`
-- 密码：`lyy20260701`
+- 密码：`lyy20260701`（建议到后台「设置」中修改）
 
 ## 日常修改
 
@@ -80,7 +83,10 @@ api/
 ├── contacts.js             # GET 联系留言列表
 └── contacts/[id].js        # DELETE 单条留言
 public/                     # 静态文件
-├── index.html / about.html / download.html / admin.html
+├── index.html / about.html / download.html
+├── c6p98uy4bu.html         # 后台入口（随机路径，已隐藏）
+├── honeypot.html           # 假后台诱饵（扫描器访问即被拉黑 IP）
+├── 404.html                # 统一错误页（不泄露服务器信息）
 └── assets/                 # CSS / JS / 图片 / 下载文件
 data.json                   # 网站配置（用 data.json 里的内容渲染）
 vercel.json                 # Vercel 路由配置

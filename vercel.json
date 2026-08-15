@@ -1,6 +1,19 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=(), payment=()" },
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
+        { "key": "X-Powered-By", "value": " " }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/(.*\\.html)", "destination": "/public/$1" },
     { "source": "/account", "destination": "/public/account.html" },
@@ -10,7 +23,13 @@
     { "source": "/forum", "destination": "/public/forum.html" },
     { "source": "/forum/post/(.*)", "destination": "/public/forum-post.html" },
     { "source": "/announcements", "destination": "/public/announcements.html" },
-    { "source": "/profile", "destination": "/public/profile.html" }
+    { "source": "/profile", "destination": "/public/profile.html" },
+    { "source": "/admin", "destination": "/public/honeypot.html" },
+    { "source": "/manage", "destination": "/public/honeypot.html" },
+    { "source": "/backend", "destination": "/public/honeypot.html" },
+    { "source": "/wp-admin", "destination": "/public/honeypot.html" },
+    { "source": "/administrator", "destination": "/public/honeypot.html" },
+    { "source": "/login", "destination": "/public/honeypot.html" }
   ],
   "functions": {
     "api/site.js": {

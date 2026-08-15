@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理后台</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:#0f172a; font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; color:#e2e8f0; }
+  .box { width:340px; background:#1e293b; border:1px solid #334155; border-radius:14px; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,.4); }
+  .box h1 { font-size:1.25rem; margin:0 0 4px; color:#fff; }
+  .sub { color:#94a3b8; font-size:.85rem; margin:0 0 24px; }
+  label { display:block; font-size:.8rem; color:#cbd5e1; margin:0 0 6px; }
+  input { width:100%; padding:10px 12px; border-radius:9px; border:1px solid #334155; background:#0f172a; color:#e2e8f0; margin-bottom:16px; }
+  button { width:100%; padding:11px; border:0; border-radius:9px; background:#2563eb; color:#fff; font-weight:600; cursor:pointer; }
+  .msg { margin-top:14px; font-size:.8rem; color:#94a3b8; min-height:1em; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>蓝云屿 · 管理后台</h1>
+    <p class="sub">请登录以继续</p>
+    <form id="f" onsubmit="return false;">
+      <label>账号</label>
+      <input type="text" id="u" placeholder="请输入账号" autocomplete="off">
+      <label>密码</label>
+      <input type="password" id="p" placeholder="请输入密码" autocomplete="off">
+      <button id="b" type="button">登 录</button>
+    </form>
+    <div class="msg" id="m">正在验证…</div>
+  </div>
+<script>
+  // 触碰假后台即触发陷阱：服务端会拉黑该 IP 并故意延迟，消耗扫描器资源
+  function trap() {
+    try { fetch('/api/site?action=trap', { method: 'POST' }).catch(function(){}); } catch (e) {}
+  }
+  trap();
+  document.getElementById('b').addEventListener('click', function () {
+    document.getElementById('m').textContent = '正在验证…';
+    trap();
+    setTimeout(function () { document.getElementById('m').textContent = '验证中，请稍候…'; }, 1500);
+  });
+</script>
+</body>
+</html>

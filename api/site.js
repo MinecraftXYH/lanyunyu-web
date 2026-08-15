@@ -5,7 +5,8 @@
 const {
   ok, fail, isAdmin, readJSON, writeJSON, readBody,
   ADMIN_USER, ADMIN_PWD, TOKEN,
-  GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN
+  GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN,
+  getClientIp, isBanned, recordFail, handleTrap
 } = require('./_lib');
 
 module.exports = async (req, res) => {
@@ -17,6 +18,10 @@ module.exports = async (req, res) => {
     return res.end();
   }
 
+  const ip = getClientIp(req);
+  // 被拉黑的 IP：任何请求一律 404，不暴露后台 / 接口是否存在
+  if (await isBanned(ip)) return fail(res, 404, 'Not Found');
+
   const url = new URL(req.url, 'http://localhost');
   const action = (url.searchParams.get('action') || '').trim();
 
@@ -27,7 +32,8 @@ module.exports = async (req, res) => {
       case 'login': return handleLogin(req, res);
       case 'health': return handleHealth(req, res);
       case 'contacts': return handleContacts(req, res, url);
-      default: return fail(res, 400, '缺少 action 参数');
+      case 'trap': return handleTrap(req, res);
+      default: return fail(res, 404, 'Not Found');
     }
   } catch (e) {
     console.error('[site]', e);
@@ -72,10 +78,13 @@ async function handleContact(req, res) {
 async function handleLogin(req, res) {
   if (req.method !== 'POST') return fail(res, 405, '仅支持 POST');
   const body = await readBody(req);
+  const ip = getClientIp(req);
   if (body.user === ADMIN_USER && body.pwd === ADMIN_PWD) {
     return ok(res, { ok: true, token: TOKEN });
   }
-  return fail(res, 401, '账号或密码错误');
+  // 登录失败：记录失败次数，超阈值直接拉黑该 IP（之后访问一律 404）
+  const banned = await recordFail(ip);
+  return fail(res, banned ? 404 : 401, banned ? 'Not Found' : '账号或密码错误');
 }
 
 async function handleHealth(req, res) {

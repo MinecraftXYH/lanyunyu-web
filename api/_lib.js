@@ -192,10 +192,114 @@ function ensureArray(user, key) {
   return user[key];
 }
 
+// ---------- 安全：登录失败限流 + IP 拉黑（防暴力破解 / 扫描） ----------
+// Vercel 函数无状态、多实例，真·按 IP 持久拉黑需要集中存储。
+// 优先用 Vercel KV / Upstash Redis（REST API，零额外依赖）；未配置则降级为单实例内存（不持久）。
+const KV_URL = process.env.KV_REST_API_URL || process.env.KV_URL || '';
+const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.KV_TOKEN || '';
+const kvEnabled = Boolean(KV_URL && KV_TOKEN);
+
+// 限流参数
+const FAIL_THRESHOLD = 5;   // 失败次数阈值
+const FAIL_WINDOW = 900;    // 失败计数窗口（秒）：15 分钟
+const BAN_TTL = 86400;      // 拉黑时长（秒）：24 小时
+
+// 内存降级（仅在未配置 KV 时使用，函数实例内有效，重启/扩容后失效）
+const _memFail = new Map(); // ip -> { count, ts }
+const _memBan = new Map();  // ip -> expireTs
+
+async function kvExec(commands) {
+  try {
+    const r = await fetch(KV_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${KV_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(commands),
+      cache: 'no-store'
+    });
+    if (!r.ok) return null;
+    const j = await r.json();
+    return j && j.result; // Upstash/Vercel KV 批处理返回 { result: [...] }
+  } catch (e) {
+    console.error('[kv] exec failed', e.message);
+    return null;
+  }
+}
+
+async function kvGet(key) {
+  if (!kvEnabled) return undefined;
+  const j = await kvExec([['GET', key]]);
+  return j && j[0] && j[0].result !== null ? j[0].result : undefined;
+}
+
+async function kvSet(key, value, ttl) {
+  if (!kvEnabled) return;
+  await kvExec([['SETEX', key, String(ttl), String(value)]]);
+}
+
+function getClientIp(req) {
+  const xff = req.headers && (req.headers['x-forwarded-for'] || req.headers['x-vercel-forwarded-for']);
+  if (xff) return String(xff).split(',')[0].trim();
+  return (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+
+async function isBanned(ip) {
+  if (!ip || ip === 'unknown') return false;
+  const exp = _memBan.get(ip);
+  if (exp) {
+    if (exp > Date.now()) return true;
+    _memBan.delete(ip);
+  }
+  if (kvEnabled) {
+    const v = await kvGet(`ban:${ip}`);
+    if (v) return true;
+  }
+  return false;
+}
+
+async function banIp(ip, ttl = BAN_TTL) {
+  if (!ip || ip === 'unknown') return;
+  _memBan.set(ip, Date.now() + ttl * 1000);
+  if (kvEnabled) await kvSet(`ban:${ip}`, '1', ttl);
+}
+
+async function recordFail(ip) {
+  if (!ip || ip === 'unknown') return false;
+  let count = 1;
+  if (kvEnabled) {
+    const v = await kvGet(`fail:${ip}`);
+    count = (parseInt(v, 10) || 0) + 1;
+    await kvSet(`fail:${ip}`, String(count), FAIL_WINDOW);
+  } else {
+    const now = Date.now();
+    const rec = _memFail.get(ip);
+    if (rec && rec.ts > now - FAIL_WINDOW * 1000) count = rec.count + 1;
+    _memFail.set(ip, { count, ts: now });
+    count = _memFail.get(ip).count;
+  }
+  if (count >= FAIL_THRESHOLD) {
+    await banIp(ip);
+    return true;
+  }
+  return false;
+}
+
+// 诱饵陷阱：访问者触碰假后台即视为恶意扫描，直接拉黑 + 人为延迟消耗其资源
+async function handleTrap(req, res) {
+  const ip = getClientIp(req);
+  await banIp(ip);
+  await new Promise(r => setTimeout(r, 1500));
+  return fail(res, 404, 'Not Found');
+}
+
 module.exports = {
   TOKEN, ADMIN_USER, ADMIN_PWD,
   GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN,
   isAdmin, ok, fail, readJSON, writeJSON, readBody,
   cors, hashPassword, verifyPassword, readUsers, writeUsers, verifyUserToken,
-  readData, writeData, ensureArray
+  readData, writeData, ensureArray,
+  kvEnabled, FAIL_THRESHOLD, FAIL_WINDOW, BAN_TTL,
+  getClientIp, isBanned, recordFail, banIp, handleTrap
 };
