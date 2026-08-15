@@ -239,6 +239,11 @@ async function kvSet(key, value, ttl) {
   await kvExec([['SETEX', key, String(ttl), String(value)]]);
 }
 
+async function kvDel(key) {
+  if (!kvEnabled) return;
+  await kvExec([['DEL', key]]);
+}
+
 function getClientIp(req) {
   const xff = req.headers && (req.headers['x-forwarded-for'] || req.headers['x-vercel-forwarded-for']);
   if (xff) return String(xff).split(',')[0].trim();
@@ -301,5 +306,5 @@ module.exports = {
   cors, hashPassword, verifyPassword, readUsers, writeUsers, verifyUserToken,
   readData, writeData, ensureArray,
   kvEnabled, FAIL_THRESHOLD, FAIL_WINDOW, BAN_TTL,
-  getClientIp, isBanned, recordFail, banIp, handleTrap
+  getClientIp, isBanned, recordFail, banIp, handleTrap, kvDel
 };

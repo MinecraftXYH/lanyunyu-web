@@ -6,7 +6,8 @@ const {
   ok, fail, isAdmin, readJSON, writeJSON, readBody,
   ADMIN_USER, ADMIN_PWD, TOKEN,
   GITHUB_REPO, GITHUB_BRANCH, GITHUB_TOKEN,
-  getClientIp, isBanned, recordFail, handleTrap
+  getClientIp, isBanned, recordFail, handleTrap,
+  kvDel
 } = require('./_lib');
 
 module.exports = async (req, res) => {
@@ -18,12 +19,17 @@ module.exports = async (req, res) => {
     return res.end();
   }
 
-  const ip = getClientIp(req);
-  // 被拉黑的 IP：任何请求一律 404，不暴露后台 / 接口是否存在
-  if (await isBanned(ip)) return fail(res, 404, 'Not Found');
+  const UNBAN_CODE = process.env.UNBAN_CODE || 'GTbuSsLWsn4z';
 
+  const ip = getClientIp(req);
   const url = new URL(req.url, 'http://localhost');
   const action = (url.searchParams.get('action') || '').trim();
+
+  // 自助解封接口必须放在拉黑检查之前，否则被封 IP 无法调用
+  if (action === 'unban-me') return handleUnban(req, res, ip, url);
+
+  // 被拉黑的 IP：任何请求一律 404，不暴露后台 / 接口是否存在
+  if (await isBanned(ip)) return fail(res, 404, 'Not Found');
 
   try {
     switch (action) {
@@ -85,6 +91,18 @@ async function handleLogin(req, res) {
   // 登录失败：记录失败次数，超阈值直接拉黑该 IP（之后访问一律 404）
   const banned = await recordFail(ip);
   return fail(res, banned ? 404 : 401, banned ? 'Not Found' : '账号或密码错误');
+}
+
+async function handleUnban(req, res, ip, url) {
+  if (req.method !== 'GET' && req.method !== 'POST') return fail(res, 405, '仅支持 GET/POST');
+  const code = (url.searchParams.get('code') || '').trim();
+  if (!code || code !== UNBAN_CODE) {
+    // 避免暴露该接口存在：返回 404
+    return fail(res, 404, 'Not Found');
+  }
+  await kvDel(`ban:${ip}`);
+  await kvDel(`fail:${ip}`);
+  return ok(res, { ok: true, ip, msg: '当前 IP 已解封，请刷新后台页重新登录。' });
 }
 
 async function handleHealth(req, res) {
