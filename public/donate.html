@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>捐助 · 蓝云屿</title>
+  <meta name="description" content="支持蓝云屿 Minecraft 服务器，让这座云上的方块岛屿继续运转下去。" />
+  <link rel="stylesheet" href="assets/css/style.css?v=15" />
+  <link rel="icon" type="image/png" href="assets/images/logo.png?v=3" />
+  <style>
+    .donate-card {
+      max-width: 520px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 36px;
+    }
+    .donate-qr {
+      width: min(280px, 80%);
+      margin: 24px auto 18px;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    }
+    .donate-note {
+      color: var(--muted);
+      font-size: .95rem;
+      margin-top: 18px;
+      line-height: 1.8;
+    }
+    .donate-thanks {
+      margin-top: 26px;
+      padding: 18px;
+      background: rgba(59, 220, 136, 0.08);
+      border: 1px solid rgba(59, 220, 136, 0.25);
+      border-radius: 14px;
+    }
+    .donate-thanks strong {
+      color: var(--accent);
+      display: block;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" id="siteLogo" href="index.html"><img class="logo" src="assets/images/logo.png" alt="蓝云屿 logo" /> 蓝云屿</a>
+      <button class="nav-toggle" id="navToggle">菜单</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">首页</a>
+        <a href="about.html">介绍</a>
+        <a href="download.html">下载</a>
+        <a href="forum.html">论坛</a>
+        <a href="announcements.html">公告</a>
+        <a href="donate.html" class="active">捐助</a>
+        <a href="index.html#community">社区</a>
+        <a href="index.html#contact">联系</a>
+        <a href="account.html" id="navAccount" class="nav-login">登录 / 注册</a>
+        <span id="navExtra"></span>
+      </div>
+    </div>
+  </nav>
+
+  <div style="height:90px;"></div>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>支持蓝云屿</h2>
+        <p>服务器因热爱而诞生，也因支持而延续</p>
+      </div>
+
+      <div class="glass donate-card">
+        <p style="color:var(--muted); margin:0;">你的每一笔捐助都会直接用于服务器租赁、网络带宽与长期维护，让更多人能在这座云上的岛屿相聚。</p>
+
+        <img class="donate-qr" src="assets/images/donate-qrcode.png" alt="捐助收款码" />
+
+        <p style="margin:8px 0 0; font-weight:700; font-size:1.1rem;">微信扫一扫，为蓝云屿续一杯咖啡 ☕</p>
+
+        <div class="donate-note">
+          <p>捐助完全自愿，金额不限。<br>完成后可在游戏内联系腐竹 <strong>Minecraft_SCX</strong>，我们会为你送上感谢称号与点券礼包。</p>
+        </div>
+
+        <div class="donate-thanks">
+          <strong>感谢你。</strong>
+          <span style="color:var(--muted);">正是因为有你们，蓝云屿才能一直开下去。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container"><p>© 蓝云屿 Minecraft 服务器 · 用心建一座岛</p></div>
+  </footer>
+
+  <script src="assets/js/main.js?v=6"></script>
+  <script src="assets/js/easter-egg.js?v=6"></script>
+  <script src="assets/js/nav-user.js?v=5"></script>
+</body>
+</html>
