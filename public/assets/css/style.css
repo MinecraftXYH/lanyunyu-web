@@ -544,7 +544,7 @@ footer {
 .forum-list { display: flex; flex-direction: column; gap: 16px; }
 .forum-item {
   background: var(--glass); border: 1px solid var(--glass-border);
-  border-radius: 16px; padding: 18px 20px;
+  border-radius: 14px; padding: 14px 16px;
   backdrop-filter: blur(12px);
 }
 .forum-meta { display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: .85rem; flex-wrap: wrap; }
@@ -554,10 +554,10 @@ footer {
 .forum-author:hover { color: var(--accent); }
 .forum-cat { background: rgba(255,255,255,.1); padding: 2px 8px; border-radius: 6px; font-size: .75rem; }
 .forum-time { color: #64748b; }
-.forum-title { display: block; color: #fff; font-size: 1.15rem; font-weight: 700; margin: 10px 0 6px; text-decoration: none; }
+.forum-title { display: block; color: #fff; font-size: 1.05rem; font-weight: 700; margin: 8px 0 4px; text-decoration: none; }
 .forum-title:hover { color: var(--accent); }
-.forum-summary { color: #94a3b8; font-size: .9rem; margin: 0 0 12px; line-height: 1.5; }
-.forum-cover { width: 100%; height: auto; border-radius: 12px; margin-bottom: 12px; display: block; border: 1px solid var(--glass-border); }
+.forum-summary { color: #94a3b8; font-size: .88rem; margin: 0 0 10px; line-height: 1.5; }
+.forum-cover { max-width: 100%; width: auto; height: auto; max-height: 240px; border-radius: 12px; margin: 0 auto 12px; display: block; border: 1px solid var(--glass-border); background: var(--glass); }
 .forum-stats { display: flex; gap: 16px; color: #94a3b8; font-size: .85rem; align-items: center; }
 .forum-body { color: #e2e8f0; line-height: 1.8; white-space: pre-wrap; }
 .like-btn { background: rgba(255,255,255,.08); border: 1px solid var(--glass-border); border-radius: 8px; color: #fca5a5; padding: 4px 10px; cursor: pointer; font: inherit; font-size: .85rem; transition: .2s; }
