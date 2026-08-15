@@ -200,7 +200,7 @@ const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.KV_TOKEN || '';
 const kvEnabled = Boolean(KV_URL && KV_TOKEN);
 
 // 限流参数
-const FAIL_THRESHOLD = 5;   // 失败次数阈值
+const FAIL_THRESHOLD = 3;   // 失败次数阈值
 const FAIL_WINDOW = 900;    // 失败计数窗口（秒）：15 分钟
 const BAN_TTL = 86400;      // 拉黑时长（秒）：24 小时
 
